@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Skills - SkillSwap</title>
+    <link rel="stylesheet" href="./main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-exchange-alt"></i>
+                <span>SkillSwap</span>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="./dashboard.html" class="nav-link">Dashboard</a>
+                <a href="./matching.html" class="nav-link">Find Skills</a>
+                <a href="./sessions.html" class="nav-link">Sessions</a>
+                <a href="./calendar.html" class="nav-link">Calendar</a>
+                <a href="./profile.html" class="nav-link">Profile</a>
+            </div>
+            <div class="nav-auth">
+                <div class="user-menu">
+                    <img src="../assets/default-avatar.png" alt="Profile" class="nav-avatar"
+                        style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
+                    <span>John Doe</span>
+                    <button onclick="app && app.logout()" class="btn btn-outline btn-sm ml-2">Logout</button>
+                </div>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <h1 class="page-title">Find Learning Partners</h1>
+                <p class="page-description">Discover peers with complementary skills for mutual learning</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Search and Filters -->
+            <div class="card mb-6">
+                <div class="flex flex-col lg:flex-row gap-4">
+                    <div class="flex-1">
+                        <div class="relative">
+                            <input type="text" placeholder="Search for skills, users, or keywords..."
+                                class="form-input pl-10" id="searchInput">
+                            <i
+                                class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <select class="form-input form-select" id="skillFilter">
+                            <option value="">All Skills</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                            <option value="react">React</option>
+                            <option value="css">CSS</option>
+                            <option value="photography">Photography</option>
+                            <option value="spanish">Spanish</option>
+                            <option value="design">Design</option>
+                        </select>
+                        <select class="form-input form-select" id="levelFilter">
+                            <option value="">All Levels</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                        <button class="btn btn-outline" onclick="toggleFilters()">
+                            <i class="fas fa-filter mr-2"></i>
+                            Filters
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters (Hidden by default) -->
+                <div id="advancedFilters" class="mt-4 pt-4 border-t border-gray-200" style="display: none;">
+                    <div class="grid grid-3 gap-4">
+                        <div>
+                            <label class="form-label">Availability</label>
+                            <select class="form-input form-select">
+                                <option value="">Any time</option>
+                                <option value="morning">Morning (6AM - 12PM)</option>
+                                <option value="afternoon">Afternoon (12PM - 6PM)</option>
+                                <option value="evening">Evening (6PM - 10PM)</option>
+                                <option value="weekend">Weekends</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Rating</label>
+                            <select class="form-input form-select">
+                                <option value="">Any rating</option>
+                                <option value="4.5">4.5+ stars</option>
+                                <option value="4.0">4.0+ stars</option>
+                                <option value="3.5">3.5+ stars</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Session Type</label>
+                            <select class="form-input form-select">
+                                <option value="">Any type</option>
+                                <option value="one-on-one">One-on-One</option>
+                                <option value="group">Group Sessions</option>
+                                <option value="workshop">Workshops</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Match Results -->
+            <div class="flex gap-6">
+                <!-- Sidebar with Quick Stats -->
+                <div class="w-1/4 space-y-4">
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-900 mb-3">Quick Stats</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Matches</span>
+                                <span class="font-semibold">47</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Perfect Matches</span>
+                                <span class="font-semibold text-green-600">12</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Online Now</span>
+                                <span class="font-semibold text-blue-600">8</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-900 mb-3">Popular Skills</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span>JavaScript</span>
+                                <span class="text-gray-500">23</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>Python</span>
+                                <span class="text-gray-500">18</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>Design</span>
+                                <span class="text-gray-500">15</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span>Spanish</span>
+                                <span class="text-gray-500">12</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Results -->
+                <div class="flex-1">
+                    <!-- Sort Options -->
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="text-gray-600">
+                            Showing <span class="font-semibold">47 matches</span> • Sorted by relevance
+                        </div>
+                        <select class="form-input form-select" style="width: auto;">
+                            <option value="relevance">Best Match</option>
+                            <option value="rating">Highest Rated</option>
+                            <option value="sessions">Most Sessions</option>
+                            <option value="recent">Recently Active</option>
+                        </select>
+                    </div>
+
+                    <!-- Match Cards -->
+                    <div class="space-y-4">
+                        <!-- Perfect Match -->
+                        <div class="card border-green-200 bg-green-50">
+                            <div class="flex items-start gap-4">
+                                <div class="relative">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-16 h-16 rounded-full">
+                                    <div
+                                        class="absolute -top-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white">
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h3 class="font-semibold text-gray-900">Sarah Chen</h3>
+                                                <span
+                                                    class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                                                    <i class="fas fa-star mr-1"></i>
+                                                    Perfect Match
+                                                </span>
+                                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                                                    Online
+                                                </span>
+                                            </div>
+                                            <div class="flex items-center gap-1 mb-2">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                </div>
+                                                <span class="text-sm text-gray-600 ml-1">4.9 (34 reviews)</span>
+                                            </div>
+                                            <p class="text-gray-700 text-sm mb-3">
+                                                Senior frontend developer specializing in React and modern JavaScript.
+                                                Looking to learn Python for backend development.
+                                            </p>
+                                            <div class="flex flex-wrap gap-2 mb-3">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-green-700 font-medium">Teaches:</span>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">React</span>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">JavaScript</span>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">CSS</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-wrap gap-2">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-purple-700 font-medium">Wants to
+                                                        learn:</span>
+                                                    <span
+                                                        class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Python</span>
+                                                    <span
+                                                        class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Node.js</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-2xl font-bold text-green-600 mb-1">95%</div>
+                                            <div class="text-xs text-gray-500 mb-3">Match Score</div>
+                                            <div class="space-y-2">
+                                                <button onclick="requestSession('sarah-chen')"
+                                                    class="btn btn-primary btn-sm w-full">
+                                                    <i class="fas fa-calendar-plus mr-1"></i>
+                                                    Request Session
+                                                </button>
+                                                <button onclick="sendMessage('sarah-chen')"
+                                                    class="btn btn-outline btn-sm w-full">
+                                                    <i class="fas fa-message mr-1"></i>
+                                                    Send Message
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Regular Match -->
+                        <div class="card">
+                            <div class="flex items-start gap-4">
+                                <div class="relative">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-16 h-16 rounded-full">
+                                    <div
+                                        class="absolute -top-1 -right-1 bg-gray-400 w-4 h-4 rounded-full border-2 border-white">
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h3 class="font-semibold text-gray-900">David Park</h3>
+                                                <span class="text-gray-500 text-sm">• Last seen 2 hours ago</span>
+                                            </div>
+                                            <div class="flex items-center gap-1 mb-2">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-gray-300 text-sm"></i>
+                                                </div>
+                                                <span class="text-sm text-gray-600 ml-1">4.6 (18 reviews)</span>
+                                            </div>
+                                            <p class="text-gray-700 text-sm mb-3">
+                                                Professional photographer and visual designer. Interested in learning
+                                                web development to create interactive portfolios.
+                                            </p>
+                                            <div class="flex flex-wrap gap-2 mb-3">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-green-700 font-medium">Teaches:</span>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Photography</span>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Design</span>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Lightroom</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-wrap gap-2">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-purple-700 font-medium">Wants to
+                                                        learn:</span>
+                                                    <span
+                                                        class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">HTML/CSS</span>
+                                                    <span
+                                                        class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">JavaScript</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-2xl font-bold text-blue-600 mb-1">78%</div>
+                                            <div class="text-xs text-gray-500 mb-3">Match Score</div>
+                                            <div class="space-y-2">
+                                                <button onclick="requestSession('david-park')"
+                                                    class="btn btn-primary btn-sm w-full">
+                                                    <i class="fas fa-calendar-plus mr-1"></i>
+                                                    Request Session
+                                                </button>
+                                                <button onclick="sendMessage('david-park')"
+                                                    class="btn btn-outline btn-sm w-full">
+                                                    <i class="fas fa-message mr-1"></i>
+                                                    Send Message
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Another Match -->
+                        <div class="card">
+                            <div class="flex items-start gap-4">
+                                <div class="relative">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-16 h-16 rounded-full">
+                                    <div
+                                        class="absolute -top-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white">
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-start justify-between">
+                                        <div>
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <h3 class="font-semibold text-gray-900">Maria Rodriguez</h3>
+                                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                                                    Online
+                                                </span>
+                                            </div>
+                                            <div class="flex items-center gap-1 mb-2">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                </div>
+                                                <span class="text-sm text-gray-600 ml-1">4.8 (27 reviews)</span>
+                                            </div>
+                                            <p class="text-gray-700 text-sm mb-3">
+                                                Native Spanish speaker and language teacher. Also skilled in digital
+                                                marketing.
+                                                Looking to improve coding skills for career transition.
+                                            </p>
+                                            <div class="flex flex-wrap gap-2 mb-3">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-green-700 font-medium">Teaches:</span>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Spanish</span>
+                                                    <span
+                                                        class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Marketing</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-wrap gap-2">
+                                                <div class="flex items-center gap-1">
+                                                    <span class="text-xs text-purple-700 font-medium">Wants to
+                                                        learn:</span>
+                                                    <span
+                                                        class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">JavaScript</span>
+                                                    <span
+                                                        class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Python</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-2xl font-bold text-blue-600 mb-1">72%</div>
+                                            <div class="text-xs text-gray-500 mb-3">Match Score</div>
+                                            <div class="space-y-2">
+                                                <button onclick="requestSession('maria-rodriguez')"
+                                                    class="btn btn-primary btn-sm w-full">
+                                                    <i class="fas fa-calendar-plus mr-1"></i>
+                                                    Request Session
+                                                </button>
+                                                <button onclick="sendMessage('maria-rodriguez')"
+                                                    class="btn btn-outline btn-sm w-full">
+                                                    <i class="fas fa-message mr-1"></i>
+                                                    Send Message
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Load More -->
+                        <div class="text-center py-8">
+                            <button class="btn btn-outline">
+                                <i class="fas fa-plus mr-2"></i>
+                                Load More Matches
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Request Session Modal -->
+    <div id="requestSessionModal" class="modal" style="display: none;">
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Request Learning Session</h3>
+                    <button onclick="closeModal(document.getElementById('requestSessionModal'))">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">What would you like to learn?</label>
+                        <select class="form-input form-select">
+                            <option value="">Select a skill</option>
+                            <option value="react">React</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="css">CSS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">What can you teach in return?</label>
+                        <select class="form-input form-select">
+                            <option value="">Select a skill</option>
+                            <option value="python">Python</option>
+                            <option value="nodejs">Node.js</option>
+                            <option value="databases">Databases</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Preferred session length</label>
+                        <select class="form-input form-select">
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="90">1.5 hours</option>
+                            <option value="120">2 hours</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="form-label">Message (Optional)</label>
+                        <textarea class="form-input form-textarea"
+                            placeholder="Introduce yourself and explain what you'd like to focus on..."></textarea>
+                    </div>
+                    <div class="flex gap-3 pt-4">
+                        <button class="btn btn-primary">Send Request</button>
+                        <button onclick="closeModal(document.getElementById('requestSessionModal'))"
+                            class="btn btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./main.js"></script>
+    <script>
+        function toggleFilters() {
+            const filters = document.getElementById('advancedFilters');
+            filters.style.display = filters.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function requestSession(userId) {
+            document.getElementById('requestSessionModal').style.display = 'flex';
+        }
+
+        function sendMessage(userId) {
+            alert(`Opening chat with ${userId}...`);
+        }
+
+        function closeModal(modal) {
+            modal.style.display = 'none';
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            // Implement search logic here
+            console.log('Searching for:', e.target.value);
+        });
+    </script>
+</body>
+
+</html>
