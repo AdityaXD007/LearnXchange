@@ -1,46 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Skills - SkillSwap</title>
-    <link rel="stylesheet" href="./main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-
-<body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-brand">
-                <i class="fas fa-exchange-alt"></i>
-                <span>SkillSwap</span>
-            </div>
-            <div class="nav-menu" id="navMenu">
-                <a href="./dashboard.html" class="nav-link">Dashboard</a>
-                <a href="./matching.html" class="nav-link">Find Skills</a>
-                <a href="./sessions.html" class="nav-link">Sessions</a>
-                <a href="./calendar.html" class="nav-link">Calendar</a>
-                <a href="./profile.html" class="nav-link">Profile</a>
-            </div>
-            <div class="nav-auth">
-                <div class="user-menu">
-                    <img src="../assets/default-avatar.png" alt="Profile" class="nav-avatar"
-                        style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px;">
-                    <span>John Doe</span>
-                    <button onclick="app && app.logout()" class="btn btn-outline btn-sm ml-2">Logout</button>
-                </div>
-            </div>
-            <div class="nav-toggle" id="navToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </nav>
-
+{% extends "base/base.html" %} {% block content %}
     <!-- Main Content -->
     <main class="main-content">
         <!-- Page Header -->
@@ -503,6 +461,4 @@
             console.log('Searching for:', e.target.value);
         });
     </script>
-</body>
-
-</html>
+{%endblock content%}

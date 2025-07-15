@@ -1,330 +1,397 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - SkillSwap</title>
-    <link rel="stylesheet" href="./main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Page Header -->
-        <div class="page-header">
-            <div class="container">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h1 class="page-title">Welcome back, John!</h1>
-                        <p class="page-description">Here's what's happening with your learning journey</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <a href="./matching.html" class="btn btn-primary">
-                            <i class="fas fa-search mr-2"></i>
-                            Find Skills
-                        </a>
-                        <a href="./sessions.html" class="btn btn-outline">
-                            <i class="fas fa-calendar-plus mr-2"></i>
-                            New Session
-                        </a>
-                    </div>
-                </div>
-            </div>
+{% extends "base/base.html" %} {% block content %}
+<!-- Main Content -->
+<main class="main-content">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="container">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="page-title">Welcome back, John!</h1>
+          <p class="page-description">
+            Here's what's happening with your learning journey
+          </p>
         </div>
-
-        <div class="container">
-            <!-- Stats Cards -->
-            <div class="grid grid-4 mb-8">
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium">Total Sessions</p>
-                            <p class="text-2xl font-bold text-gray-900">24</p>
-                            <p class="text-green-600 text-sm">
-                                <i class="fas fa-arrow-up mr-1"></i>
-                                +3 this week
-                            </p>
-                        </div>
-                        <div class="bg-blue-100 p-3 rounded-lg">
-                            <i class="fas fa-video text-blue-600 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium">Skills Learned</p>
-                            <p class="text-2xl font-bold text-gray-900">8</p>
-                            <p class="text-blue-600 text-sm">
-                                <i class="fas fa-plus mr-1"></i>
-                                2 in progress
-                            </p>
-                        </div>
-                        <div class="bg-green-100 p-3 rounded-lg">
-                            <i class="fas fa-graduation-cap text-green-600 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium">Skills Taught</p>
-                            <p class="text-2xl font-bold text-gray-900">12</p>
-                            <p class="text-purple-600 text-sm">
-                                <i class="fas fa-users mr-1"></i>
-                                15 students
-                            </p>
-                        </div>
-                        <div class="bg-purple-100 p-3 rounded-lg">
-                            <i class="fas fa-chalkboard-teacher text-purple-600 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-600 text-sm font-medium">Rating</p>
-                            <p class="text-2xl font-bold text-gray-900">4.8</p>
-                            <div class="flex items-center text-sm text-yellow-600">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <span class="ml-1 text-gray-500">(23 reviews)</span>
-                            </div>
-                        </div>
-                        <div class="bg-yellow-100 p-3 rounded-lg">
-                            <i class="fas fa-star text-yellow-600 text-xl"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-2 gap-6 mb-8">
-                <!-- Upcoming Sessions -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="flex justify-between items-center">
-                            <h3 class="card-title">Upcoming Sessions</h3>
-                            <a href="./sessions.html" class="text-blue-600 hover:text-blue-500 text-sm font-medium">
-                                View all
-                            </a>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <img src="../assets/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
-                                <div>
-                                    <p class="font-medium text-gray-900">JavaScript Basics</p>
-                                    <p class="text-sm text-gray-600">with Sarah Chen</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">Today, 2:00 PM</p>
-                                <p class="text-xs text-green-600">
-                                    <i class="fas fa-video mr-1"></i>
-                                    Join Meeting
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <img src="../assets/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
-                                <div>
-                                    <p class="font-medium text-gray-900">Spanish Conversation</p>
-                                    <p class="text-sm text-gray-600">with Maria Rodriguez</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">Tomorrow, 10:00 AM</p>
-                                <p class="text-xs text-blue-600">
-                                    <i class="fas fa-calendar mr-1"></i>
-                                    Scheduled
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <img src="../assets/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
-                                <div>
-                                    <p class="font-medium text-gray-900">React Components</p>
-                                    <p class="text-sm text-gray-600">teaching Alex Kim</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">Friday, 3:00 PM</p>
-                                <p class="text-xs text-purple-600">
-                                    <i class="fas fa-chalkboard-teacher mr-1"></i>
-                                    Teaching
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Recent Activity</h3>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex items-start gap-3">
-                            <div class="bg-green-100 p-2 rounded-full">
-                                <i class="fas fa-check text-green-600"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">Session completed</p>
-                                <p class="text-xs text-gray-600">Finished "Photography Basics" with Tom Wilson</p>
-                                <p class="text-xs text-gray-500">2 hours ago</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <div class="bg-blue-100 p-2 rounded-full">
-                                <i class="fas fa-star text-blue-600"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">New review received</p>
-                                <p class="text-xs text-gray-600">Emma gave you 5 stars for "CSS Grid Layout"</p>
-                                <p class="text-xs text-gray-500">1 day ago</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <div class="bg-purple-100 p-2 rounded-full">
-                                <i class="fas fa-calendar-plus text-purple-600"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">New session request</p>
-                                <p class="text-xs text-gray-600">Mike wants to learn "Node.js API Development"</p>
-                                <p class="text-xs text-gray-500">2 days ago</p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-start gap-3">
-                            <div class="bg-yellow-100 p-2 rounded-full">
-                                <i class="fas fa-trophy text-yellow-600"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900">Achievement unlocked</p>
-                                <p class="text-xs text-gray-600">Earned "Mentor" badge for completing 20 teaching sessions</p>
-                                <p class="text-xs text-gray-500">3 days ago</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Skills Progress -->
-            <div class="grid grid-2 gap-6">
-                <!-- Learning Progress -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Learning Progress</h3>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-medium text-gray-700">JavaScript</span>
-                                <span class="text-sm text-gray-500">75%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-medium text-gray-700">Spanish</span>
-                                <span class="text-sm text-gray-500">45%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: 45%"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-medium text-gray-700">Photography</span>
-                                <span class="text-sm text-gray-500">90%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-purple-600 h-2 rounded-full" style="width: 90%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Skill Matches -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="flex justify-between items-center">
-                            <h3 class="card-title">New Skill Matches</h3>
-                            <a href="matching.html" class="text-blue-600 hover:text-blue-500 text-sm font-medium">
-                                View all
-                            </a>
-                        </div>
-                    </div>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                            <div class="flex items-center gap-3">
-                                <img src="../assets/default-avatar.png" alt="User" class="w-8 h-8 rounded-full">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">Lisa Park</p>
-                                    <p class="text-xs text-gray-600">Teaches React, wants to learn Node.js</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                                    95% match
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                            <div class="flex items-center gap-3">
-                                <img src="../assets/default-avatar.png" alt="User" class="w-8 h-8 rounded-full">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">David Chen</p>
-                                    <p class="text-xs text-gray-600">Teaches Photography, wants to learn CSS</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                    88% match
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                            <div class="flex items-center gap-3">
-                                <img src="../assets/default-avatar.png" alt="User" class="w-8 h-8 rounded-full">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">Ana Garcia</p>
-                                    <p class="text-xs text-gray-600">Teaches Spanish, wants to learn JavaScript</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                                    82% match
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="flex gap-3">
+          <a href="./matching.html" class="btn btn-primary">
+            <i class="fas fa-search mr-2"></i>
+            Find Skills
+          </a>
+          <a href="./sessions.html" class="btn btn-outline">
+            <i class="fas fa-calendar-plus mr-2"></i>
+            New Session
+          </a>
         </div>
-    </main>
+      </div>
+    </div>
+  </div>
 
-    <script src="./main.js"></script>
-</body>
-</html>
+  <div class="container">
+    <!-- Stats Cards -->
+    <div class="grid grid-4 mb-8">
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Total Sessions</p>
+            <p class="text-2xl font-bold text-gray-900">24</p>
+            <p class="text-green-600 text-sm">
+              <i class="fas fa-arrow-up mr-1"></i>
+              +3 this week
+            </p>
+          </div>
+          <div class="bg-blue-100 p-3 rounded-lg">
+            <i class="fas fa-video text-blue-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Skills Learned</p>
+            <p class="text-2xl font-bold text-gray-900">8</p>
+            <p class="text-blue-600 text-sm">
+              <i class="fas fa-plus mr-1"></i>
+              2 in progress
+            </p>
+          </div>
+          <div class="bg-green-100 p-3 rounded-lg">
+            <i class="fas fa-graduation-cap text-green-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Skills Taught</p>
+            <p class="text-2xl font-bold text-gray-900">12</p>
+            <p class="text-purple-600 text-sm">
+              <i class="fas fa-users mr-1"></i>
+              15 students
+            </p>
+          </div>
+          <div class="bg-purple-100 p-3 rounded-lg">
+            <i class="fas fa-chalkboard-teacher text-purple-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-gray-600 text-sm font-medium">Rating</p>
+            <p class="text-2xl font-bold text-gray-900">4.8</p>
+            <div class="flex items-center text-sm text-yellow-600">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <span class="ml-1 text-gray-500">(23 reviews)</span>
+            </div>
+          </div>
+          <div class="bg-yellow-100 p-3 rounded-lg">
+            <i class="fas fa-star text-yellow-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-2 gap-6 mb-8">
+      <!-- Upcoming Sessions -->
+      <div class="card">
+        <div class="card-header">
+          <div class="flex justify-between items-center">
+            <h3 class="card-title">Upcoming Sessions</h3>
+            <a
+              href="./sessions.html"
+              class="text-blue-600 hover:text-blue-500 text-sm font-medium"
+            >
+              View all
+            </a>
+          </div>
+        </div>
+        <div class="space-y-4">
+          <div
+            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+          >
+            <div class="flex items-center gap-3">
+              <img
+                src="../assets/default-avatar.png"
+                alt="User"
+                class="w-10 h-10 rounded-full"
+              />
+              <div>
+                <p class="font-medium text-gray-900">JavaScript Basics</p>
+                <p class="text-sm text-gray-600">with Sarah Chen</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-medium text-gray-900">Today, 2:00 PM</p>
+              <p class="text-xs text-green-600">
+                <i class="fas fa-video mr-1"></i>
+                Join Meeting
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+          >
+            <div class="flex items-center gap-3">
+              <img
+                src="../assets/default-avatar.png"
+                alt="User"
+                class="w-10 h-10 rounded-full"
+              />
+              <div>
+                <p class="font-medium text-gray-900">Spanish Conversation</p>
+                <p class="text-sm text-gray-600">with Maria Rodriguez</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-medium text-gray-900">
+                Tomorrow, 10:00 AM
+              </p>
+              <p class="text-xs text-blue-600">
+                <i class="fas fa-calendar mr-1"></i>
+                Scheduled
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+          >
+            <div class="flex items-center gap-3">
+              <img
+                src="../assets/default-avatar.png"
+                alt="User"
+                class="w-10 h-10 rounded-full"
+              />
+              <div>
+                <p class="font-medium text-gray-900">React Components</p>
+                <p class="text-sm text-gray-600">teaching Alex Kim</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-medium text-gray-900">Friday, 3:00 PM</p>
+              <p class="text-xs text-purple-600">
+                <i class="fas fa-chalkboard-teacher mr-1"></i>
+                Teaching
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Recent Activity</h3>
+        </div>
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <div class="bg-green-100 p-2 rounded-full">
+              <i class="fas fa-check text-green-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">Session completed</p>
+              <p class="text-xs text-gray-600">
+                Finished "Photography Basics" with Tom Wilson
+              </p>
+              <p class="text-xs text-gray-500">2 hours ago</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="bg-blue-100 p-2 rounded-full">
+              <i class="fas fa-star text-blue-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">
+                New review received
+              </p>
+              <p class="text-xs text-gray-600">
+                Emma gave you 5 stars for "CSS Grid Layout"
+              </p>
+              <p class="text-xs text-gray-500">1 day ago</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="bg-purple-100 p-2 rounded-full">
+              <i class="fas fa-calendar-plus text-purple-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">
+                New session request
+              </p>
+              <p class="text-xs text-gray-600">
+                Mike wants to learn "Node.js API Development"
+              </p>
+              <p class="text-xs text-gray-500">2 days ago</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <div class="bg-yellow-100 p-2 rounded-full">
+              <i class="fas fa-trophy text-yellow-600"></i>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-medium text-gray-900">
+                Achievement unlocked
+              </p>
+              <p class="text-xs text-gray-600">
+                Earned "Mentor" badge for completing 20 teaching sessions
+              </p>
+              <p class="text-xs text-gray-500">3 days ago</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills Progress -->
+    <div class="grid grid-2 gap-6">
+      <!-- Learning Progress -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Learning Progress</h3>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">JavaScript</span>
+              <span class="text-sm text-gray-500">75%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="bg-blue-600 h-2 rounded-full"
+                style="width: 75%"
+              ></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">Spanish</span>
+              <span class="text-sm text-gray-500">45%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="bg-green-600 h-2 rounded-full"
+                style="width: 45%"
+              ></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">Photography</span>
+              <span class="text-sm text-gray-500">90%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div
+                class="bg-purple-600 h-2 rounded-full"
+                style="width: 90%"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skill Matches -->
+      <div class="card">
+        <div class="card-header">
+          <div class="flex justify-between items-center">
+            <h3 class="card-title">New Skill Matches</h3>
+            <a
+              href="matching.html"
+              class="text-blue-600 hover:text-blue-500 text-sm font-medium"
+            >
+              View all
+            </a>
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div
+            class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+          >
+            <div class="flex items-center gap-3">
+              <img
+                src="../assets/default-avatar.png"
+                alt="User"
+                class="w-8 h-8 rounded-full"
+              />
+              <div>
+                <p class="text-sm font-medium text-gray-900">Lisa Park</p>
+                <p class="text-xs text-gray-600">
+                  Teaches React, wants to learn Node.js
+                </p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span
+                class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full"
+              >
+                95% match
+              </span>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+          >
+            <div class="flex items-center gap-3">
+              <img
+                src="../assets/default-avatar.png"
+                alt="User"
+                class="w-8 h-8 rounded-full"
+              />
+              <div>
+                <p class="text-sm font-medium text-gray-900">David Chen</p>
+                <p class="text-xs text-gray-600">
+                  Teaches Photography, wants to learn CSS
+                </p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span
+                class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full"
+              >
+                88% match
+              </span>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+          >
+            <div class="flex items-center gap-3">
+              <img
+                src="../assets/default-avatar.png"
+                alt="User"
+                class="w-8 h-8 rounded-full"
+              />
+              <div>
+                <p class="text-sm font-medium text-gray-900">Ana Garcia</p>
+                <p class="text-xs text-gray-600">
+                  Teaches Spanish, wants to learn JavaScript
+                </p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span
+                class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full"
+              >
+                82% match
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock content %}

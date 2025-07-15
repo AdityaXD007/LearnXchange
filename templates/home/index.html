@@ -1,0 +1,131 @@
+{% extends "base/base.html" %}
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Exchange Skills,<br>
+                    <span class="gradient-text">Build Community</span>
+                </h1>
+                <p class="hero-description">
+                    Connect with peers to teach what you know and learn what you need.
+                    SkillSwap makes knowledge sharing simple, accessible, and rewarding.
+                </p>
+                <div class="hero-buttons">
+                    <a href="src/pages/register.html" class="btn btn-primary btn-large">
+                        Get Started Free
+                    </a>
+                    <a href="#how-it-works" class="btn btn-outline btn-large">
+                        Learn More
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">1,000+</span>
+                        <span class="stat-label">Active Learners</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Skills Taught</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">2,500+</span>
+                        <span class="stat-label">Sessions Completed</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="skill-cards">
+                    <div class="skill-card">
+                        <i class="fab fa-js-square"></i>
+                        <span>JavaScript</span>
+                    </div>
+                    <div class="skill-card">
+                        <i class="fas fa-paint-brush"></i>
+                        <span>Design</span>
+                    </div>
+                    <div class="skill-card">
+                        <i class="fas fa-camera"></i>
+                        <span>Photography</span>
+                    </div>
+                    <div class="skill-card">
+                        <i class="fas fa-language"></i>
+                        <span>Spanish</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How SkillSwap Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Create Your Profile</h3>
+                    <p>Set up your profile with skills you can teach and want to learn</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Find Matches</h3>
+                    <p>Discover peers with complementary skills and schedule sessions</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Learn & Teach</h3>
+                    <p>Exchange knowledge through one-on-one video sessions</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>Build Reputation</h3>
+                    <p>Rate sessions and build your reputation in the community</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Platform Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>Smart Scheduling</h3>
+                    <p>Integrated calendar system to manage your learning sessions</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-comments"></i>
+                    <h3>Built-in Chat</h3>
+                    <p>Communicate with your learning partners before and after sessions</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Gamification</h3>
+                    <p>Earn badges and climb leaderboards as you learn and teach</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Safe & Secure</h3>
+                    <p>Rating system and verified profiles ensure quality interactions</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <script src="src/scripts/main.js"></script>
+</body>
+</html>
+{% endblock content %}
