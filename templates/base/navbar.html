@@ -8,11 +8,11 @@
       <div class="nav-menu" id="mobile-nav">
 
         <a href="{% url 'index' %}" class="nav-link">Home</a>
-        <a href="{%url "dashboard"%}" class="nav-link">Dashboard</a>
-        <a href="{%url "matching"%}" class="nav-link">Find Skills</a>
-        <a href="{%url "sessions"%}" class="nav-link">Sessions</a>
-        <a href="{%url "calendar"%}" class="nav-link">Calendar</a>
-        <a href="{%url "profile"%}" class="nav-link">Profile</a>
+        <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+        <a href="{% url 'matching' %}" class="nav-link">Find Skills</a>
+        <a href="{% url 'sessions' %}" class="nav-link">Sessions</a>
+        <a href="{% url 'calendar' %}" class="nav-link">Calendar</a>
+        <a href="{% url 'profile' %}" class="nav-link">Profile</a>
       </div>
       
 
@@ -28,7 +28,7 @@
         </button>
         <div class="dropdown-content" id="profile-dropdown">
           <span>{{ user.username }}</span>
-          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'profile' %}">Profile</a>
           <a href="{% url 'logout' %}">Logout</a>
         </div>
       </div>
@@ -90,70 +90,70 @@
     });
   });
 </script>
-<style>
-  /* User dropdown */
-  .user-dropdown {
-    position: relative;
-    display: inline-block;
-  }
+<style>/* User dropdown */
+.user-dropdown {
+  position: relative;
+  display: inline-block;
+}
 
-  .profile-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-  }
+.profile-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
 
-  .profile-pic {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--light-gray);
-  }
+.profile-pic {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border-light);
+}
 
-  /* Dropdown styles */
-  .dropdown-content {
-    background-color: var(--light-gray);
-    color: var(--black);
-    box-shadow: var(--box-shadow);
-    border: 1px solid var(--stone-gray);
-    border-radius: var(--border-radius);
-    transition: var(--transition);
+/* Dropdown styles */
+.dropdown-content {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-dark);
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--color-border-medium);
+  border-radius: 8px;
+  transition: var(--transition);
 
-    display: none;
-    position: absolute;
-    top: 50px;
-    right: 0;
-    min-width: 180px;
-    z-index: 1000;
-    text-align: left;
-    padding: 8px 0;
-  }
+  display: none;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  min-width: 180px;
+  z-index: 1000;
+  text-align: left;
+  padding: 8px 0;
+}
 
-  .dropdown-content span {
-    display: block;
-    padding: 12px 16px;
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--black);
-    border-bottom: 1px solid var(--stone-gray);
-  }
+.dropdown-content span {
+  display: block;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text-dark);
+  border-bottom: 1px solid var(--color-border-medium);
+}
 
-  .dropdown-content a {
-    display: block;
-    padding: 12px 16px;
-    font-size: 14px;
-    color: var(--black);
-    text-decoration: none;
-    transition: background 0.2s ease;
-  }
+.dropdown-content a {
+  display: block;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--color-text-dark);
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
 
-  .dropdown-content a:hover {
-    background-color: var(--secondary-green);
-    color: var(--white);
-  }
-  /* Hide hamburger on desktop */
+.dropdown-content a:hover {
+  background-color: var(--color-primary-hover);
+  color: var(--color-white);
+}
+
+/* Hide hamburger on desktop */
 .nav-toggle {
   display: none;
 }
@@ -164,7 +164,7 @@
   }
 
   .nav-menu {
-    display: none; /* optionally hide menu in mobile view until toggled */
+    display: none;
   }
 }
 

@@ -8,6 +8,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('matching/', views.matching, name='matching'),
     path('profile/', views.profile, name='profile'),
+    path('update-profile/', views.update_profile, name='update_profile'),
     path('sessions/', views.sessions, name='sessions'),
     path('calendar/', views.calendar, name='calendar'),
     path('base/', views.base, name='base'),
@@ -19,4 +20,4 @@ urlpatterns = [
     path('forgot-password/', views.password_reset_request, name='password_reset'),
     path('forgot-password/otp/', views.password_reset_otp, name='password_reset_otp'),
     path('forgot-password/confirm/', views.password_reset_confirm, name='password_reset_confirm'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

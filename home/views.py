@@ -8,6 +8,9 @@ from django.core.mail import send_mail
 import random
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404
+from .models import Profile
+from django.views.decorators.csrf import csrf_exempt
+import os
 
 # Create your views here.
 def index(request):
@@ -19,8 +22,46 @@ def dashboard(request):
 def matching(request):
     return render(request, 'home/matching.html')
 
+@login_required
 def profile(request):
-    return render(request, 'home/profile.html')
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    
+    # Check if the image file actually exists
+    if profile.image:
+        image_path = os.path.join(settings.MEDIA_ROOT, str(profile.image))
+        if not os.path.exists(image_path):
+            # Clear the broken image reference
+            profile.image = None
+            profile.save()
+    
+    if request.method == 'POST':
+        image = request.FILES.get('image')
+        if image:
+            profile.image = image
+            profile.save()
+        return redirect('profile')
+
+    return render(request, 'home/profile.html', {
+        'user': request.user,
+        'profile': profile
+    })
+
+@login_required
+@csrf_exempt
+def update_profile(request):
+    if request.method == 'POST':
+        profile, created = Profile.objects.get_or_create(user=request.user)
+
+        profile.full_name = request.POST.get('full_name')
+        profile.email = request.POST.get('email')
+        profile.location = request.POST.get('location')
+        profile.bio = request.POST.get('bio')
+        profile.languages = request.POST.get('languages')
+        profile.save()
+
+        return redirect('profile')  # replace with your URL name if different
+
+    return redirect('profile')
 
 def sessions(request):
     return render(request, 'home/sessions.html')

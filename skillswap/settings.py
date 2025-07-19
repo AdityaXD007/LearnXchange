@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     #Apps
-    'home',
+    'home.apps.HomeConfig'
 ]
 
 MIDDLEWARE = [
@@ -132,6 +132,9 @@ STATICFILES_DIRS = [
 
 # This is where Django will collect static files for production
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Default primary key field type

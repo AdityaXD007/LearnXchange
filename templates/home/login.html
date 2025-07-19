@@ -72,8 +72,8 @@
       <h2>Login</h2>
 
       <!-- Add this section to display messages -->
-      {% if messages %} {% for message in messages %} {% if message.tags ==
-      'error' %}
+      {% if messages %} {% for message in messages %} 
+      {% if message.tags == 'error' %}
       <div class="form-errors">{{ message }}</div>
       {% else %}
       <div class="form-success">{{ message }}</div>
