@@ -1,65 +1,46 @@
 <div class="form-container">
-  <h2>Sign Up</h2>
-
-  {% if messages %}
-    {% for message in messages %}
-      <div class="form-errors">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-
-  {% if form.non_field_errors %}
-    <div class="form-errors">
-      {% for error in form.non_field_errors %}
-        {{ error }}
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  <form method="post">
-    {% csrf_token %}
-    
-    {{ form.username.label_tag }}
-    {{ form.username }}
-    {% if form.username.errors %}
-      <div class="field-errors">
-        {% for error in form.username.errors %}
-          {{ error }}
-        {% endfor %}
-      </div>
+    <h2>Sign Up</h2>
+    {% if messages %}
+        {% for message in messages %}<div class="form-errors">{{ message }}</div>{% endfor %}
     {% endif %}
-
-    {{ form.password1.label_tag }}
-    <div class="password-wrapper">
-      {{ form.password1 }}
-      <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
-    </div>
-    {% if form.password1.errors %}
-      <div class="field-errors">
-        {% for error in form.password1.errors %}
-          {{ error }}
-        {% endfor %}
-      </div>
+    {% if form.non_field_errors %}
+        <div class="form-errors">
+            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+        </div>
     {% endif %}
-
-    {{ form.password2.label_tag }}
-    <div class="password-wrapper">
-      {{ form.password2 }}
-      <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
-    </div>
-    {% if form.password2.errors %}
-      <div class="field-errors">
-        {% for error in form.password2.errors %}
-          {{ error }}
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <button type="submit">Register</button>
-  </form>
-
-  <a href="{% url 'login' %}">Already have an account? Login</a>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}
+            <div class="field-errors">
+                {% for error in form.username.errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+        {{ form.password1.label_tag }}
+        <div class="password-wrapper">
+            {{ form.password1 }}
+            <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
+        </div>
+        {% if form.password1.errors %}
+            <div class="field-errors">
+                {% for error in form.password1.errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+        {{ form.password2.label_tag }}
+        <div class="password-wrapper">
+            {{ form.password2 }}
+            <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
+        </div>
+        {% if form.password2.errors %}
+            <div class="field-errors">
+                {% for error in form.password2.errors %}{{ error }}{% endfor %}
+            </div>
+        {% endif %}
+        <button type="submit">Register</button>
+    </form>
+    <a href="{% url 'login' %}">Already have an account? Login</a>
 </div>
-
 <script>
   function togglePassword(element) {
     let input = element.previousElementSibling;
@@ -67,7 +48,6 @@
     element.textContent = input.type === "password" ? "👁️" : "🙈";
   }
 </script>
-
 <style>
   body {
     background-color: #f0f6ff;

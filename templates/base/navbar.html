@@ -1,57 +1,52 @@
 <!-- Navigation -->
-  <nav class="navbar">
+<nav class="navbar">
     <div class="nav-container">
-      <div class="nav-brand">
-        <i class="fas fa-exchange-alt"></i>
-        <span>SkillSwap</span>
-      </div>
-      <div class="nav-menu" id="mobile-nav">
-
-        <a href="{% url 'index' %}" class="nav-link">Home</a>
-        <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
-        <a href="{% url 'matching' %}" class="nav-link">Find Skills</a>
-        <a href="{% url 'sessions' %}" class="nav-link">Sessions</a>
-        <a href="{% url 'calendar' %}" class="nav-link">Calendar</a>
-        <a href="{% url 'profile' %}" class="nav-link">Profile</a>
-      </div>
-      
-
-      <!-- Auth Buttons or User Dropdown -->
-      {% if user.is_authenticated %}
-      <div class="user-dropdown">
-        <button class="profile-btn" onclick="toggleDropdown()">
-          <img
-            src="https://ui-avatars.com/api/?name={{ user.username }}&background=random"
-            alt="Profile"
-            class="profile-pic"
-          />
-        </button>
-        <div class="dropdown-content" id="profile-dropdown">
-          <span>{{ user.username }}</span>
-          <a href="{% url 'profile' %}">Profile</a>
-          <a href="{% url 'logout' %}">Logout</a>
+        <div class="nav-brand">
+            <i class="fas fa-exchange-alt"></i>
+            <span>SkillSwap</span>
         </div>
-      </div>
-      {% else %}
-      <div class="auth-buttons" >
-        <a href="{% url 'login' %}">
-          <button class="btn btn-outline" id="login-btn">Log in</button></a>
-        <a href="{% url 'signup' %}">
-          <button class="btn btn-primary" id="signup-btn">Sign up</button>
-        </a>
-      </div>
-      {% endif %}
-      <div class="nav-toggle" id="menu-toggle">
-  <i class="fas fa-bars"></i>
+        <div class="nav-menu" id="mobile-nav">
+            <a href="{% url 'index' %}" class="nav-link">Home</a>
+            <a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a>
+            <a href="{% url 'matching' %}" class="nav-link">Find Skills</a>
+            <a href="{% url 'sessions' %}" class="nav-link">Sessions</a>
+            <a href="{% url 'calendar' %}" class="nav-link">Calendar</a>
+            <a href="{% url 'profile' %}" class="nav-link">Profile</a>
+        </div>
+        <!-- Auth Buttons or User Dropdown -->
+        {% if user.is_authenticated %}
+            <div class="user-dropdown">
+                <button class="profile-btn" onclick="toggleDropdown()">
+                    {% if user.profile and user.profile.image %}
+                        <img src="{{ user.profile.image.url }}" alt="Profile" class="profile-pic" />
+                    {% else %}
+                        <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random"
+                             alt="Profile"
+                             class="profile-pic" />
+                    {% endif %}
+                </button>
+                <div class="dropdown-content" id="profile-dropdown">
+                    <span>{{ user.username }}</span>
+                    <a href="{% url 'profile' %}">Profile</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="auth-buttons">
+                <a href="{% url 'login' %}">
+                    <button class="btn btn-outline" id="login-btn">Log in</button>
+                </a>
+                <a href="{% url 'signup' %}">
+                    <button class="btn btn-primary" id="signup-btn">Sign up</button>
+                </a>
+            </div>
+        {% endif %}
+        <div class="nav-toggle" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
 </div>
-
-    </div>
-
-    </div>
-  </nav>
-
-  
-
+</nav>
 <script>
   function toggleDropdown() {
     const dropdown = document.getElementById("profile-dropdown");
@@ -104,8 +99,8 @@
 }
 
 .profile-pic {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--color-border-light);

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Login</title>
-    <style>
+    <head>
+        <title>Login</title>
+        <style>
       body {
         background-color: #f0f6ff;
         font-family: sans-serif;
@@ -65,46 +65,45 @@
         border-radius: 6px;
         margin-bottom: 12px;
       }
-    </style>
-  </head>
-  <body>
-    <div class="form-container">
-      <h2>Login</h2>
-
-      <!-- Add this section to display messages -->
-      {% if messages %} {% for message in messages %} 
-      {% if message.tags == 'error' %}
-      <div class="form-errors">{{ message }}</div>
-      {% else %}
-      <div class="form-success">{{ message }}</div>
-      {% endif %} {% endfor %} {% endif %}
-
-      <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ next }}" />
-
-        <label for="username">Username</label><br />
-        <input type="text" name="username" id="username" required /><br />
-
-        <label for="password">Password</label><br />
-        <div class="password-wrapper">
-          <input type="password" name="password" id="password" required />
-          <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
+        </style>
+    </head>
+    <body>
+        <div class="form-container">
+            <h2>Login</h2>
+            <!-- Add this section to display messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <div class="form-errors">{{ message }}</div>
+                    {% else %}
+                        <div class="form-success">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}" />
+                <label for="username">Username</label>
+                <br />
+                <input type="text" name="username" id="username" required />
+                <br />
+                <label for="password">Password</label>
+                <br />
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" required />
+                    <span class="toggle-password" onclick="togglePassword(this)">👁️</span>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+            <a href="{% url 'password_reset' %}">Forgot Password?</a>
+            <a href="{% url 'signup' %}">Create new account</a>
         </div>
-
-        <button type="submit">Login</button>
-      </form>
-
-      <a href="{% url 'password_reset' %}">Forgot Password?</a>
-      <a href="{% url 'signup' %}">Create new account</a>
-    </div>
-
-    <script>
+        <script>
       function togglePassword(element) {
         let input = element.previousElementSibling;
         input.type = input.type === "password" ? "text" : "password";
         element.textContent = input.type === "password" ? "👁️" : "🙈";
       }
-    </script>
-  </body>
+        </script>
+    </body>
 </html>

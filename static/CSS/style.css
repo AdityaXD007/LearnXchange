@@ -582,6 +582,9 @@ body {
   width: 96px;
   height: 96px;
   margin: 0 auto;
+  border: 3px solid var(--color-secondary-hover);
+  border-radius: 50%;
+  box-sizing: border-box;
 }
 
 .profile-image {
@@ -592,11 +595,9 @@ body {
   object-fit: cover;
   object-position: center;
   border: 2px solid var(--color-border-light);
-  background-color: #f0f0f0;
-
-  /* Hide alt text completely */
-  font-size: 0;
+  background-color: #f0f0f0; /* fallback color */
   text-indent: -9999px;
+  font-size: 0;
   color: transparent;
 }
 
@@ -605,7 +606,7 @@ body {
   display: none;
 }
 
-/* '+' Circle overlay */
+/* '+' Circle overlay for no image */
 .upload-overlay {
   position: absolute;
   top: 0;
@@ -629,6 +630,34 @@ body {
   color: var(--color-primary-hover);
   font-size: 24px;
   font-weight: bold;
+}
+
+/* NEW: Edit overlay for existing images */
+.edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Show edit overlay on hover */
+.profile-image-container:hover .edit-overlay {
+  opacity: 1;
+}
+
+/* Camera icon styling */
+.edit-overlay i {
+  color: white;
+  font-size: 18px;
 }
 
 /* Grid Layouts */
