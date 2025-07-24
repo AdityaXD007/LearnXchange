@@ -36,15 +36,16 @@
                 <a href="{% url 'login' %}">
                     <button class="btn btn-outline" id="login-btn">Log in</button>
                 </a>
+
                 <a href="{% url 'signup' %}">
-                    <button class="btn btn-primary" id="signup-btn">Sign up</button>
+                <button class="btn btn-primary" id="signup-btn">Sign up</button>
                 </a>
             </div>
-        {% endif %}
-        <div class="nav-toggle" id="menu-toggle">
-            <i class="fas fa-bars"></i>
-        </div>
+    {% endif %}
+    <div class="nav-toggle" id="menu-toggle">
+        <i class="fas fa-bars"></i>
     </div>
+</div>
 </div>
 </nav>
 <script>
@@ -99,8 +100,8 @@
 }
 
 .profile-pic {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--color-border-light);

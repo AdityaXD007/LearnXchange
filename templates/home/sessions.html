@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% block content %}
+
     <!-- Main Content -->
     <main class="main-content">
         <!-- Page Header -->
@@ -7,287 +8,524 @@
             <div class="container">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h1 class="page-title">My Calendar</h1>
-                        <p class="page-description">Manage your availability and scheduled sessions</p>
+                        <h1 class="page-title">My Sessions</h1>
+                        <p class="page-description">Manage your learning sessions, requests, and bookings</p>
                     </div>
-                    <div class="flex gap-3">
-                        <button onclick="openModal('availabilityModal')" class="btn btn-outline">
-                            <i class="fas fa-clock mr-2"></i>
-                            Set Availability
-                        </button>
-                        <button onclick="openModal('blockTimeModal')" class="btn btn-primary">
-                            <i class="fas fa-ban mr-2"></i>
-                            Block Time
-                        </button>
-                    </div>
+                    <a href="matching.html" class="btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        Find New Session
+                    </a>
                 </div>
             </div>
         </div>
+
         <div class="container">
-            <!-- Calendar Controls -->
+            <!-- Session Tabs -->
             <div class="card mb-6">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-4">
-                        <button onclick="changeMonth(-1)" class="btn btn-outline">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <h2 class="text-xl font-semibold" id="currentMonth">January 2024</h2>
-                        <button onclick="changeMonth(1)" class="btn btn-outline">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                        <button onclick="goToToday()" class="btn btn-outline">Today</button>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 bg-green-400 rounded"></div>
-                                <span class="text-sm">Available</span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 bg-blue-500 rounded"></div>
-                                <span class="text-sm">Scheduled</span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 bg-red-400 rounded"></div>
-                                <span class="text-sm">Blocked</span>
+                <div class="flex border-b border-gray-200">
+                    <button onclick="showTab('upcoming')" class="tab-button active" id="upcomingTab">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        Upcoming Sessions
+                        <span class="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">3</span>
+                    </button>
+                    <button onclick="showTab('requests')" class="tab-button" id="requestsTab">
+                        <i class="fas fa-inbox mr-2"></i>
+                        Requests
+                        <span class="ml-2 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">5</span>
+                    </button>
+                    <button onclick="showTab('history')" class="tab-button" id="historyTab">
+                        <i class="fas fa-history mr-2"></i>
+                        Session History
+                    </button>
+                    <button onclick="showTab('feedback')" class="tab-button" id="feedbackTab">
+                        <i class="fas fa-star mr-2"></i>
+                        Pending Feedback
+                        <span class="ml-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upcoming Sessions Tab -->
+            <div id="upcomingContent" class="tab-content">
+                <div class="space-y-4">
+                    <!-- Today's Sessions -->
+                    <div class="card border-blue-200 bg-blue-50">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-blue-900">Today's Sessions</h3>
+                            <span class="text-blue-600 text-sm">January 15, 2024</span>
+                        </div>
+
+                        <div class="bg-white rounded-lg p-4 border border-blue-200">
+                            <div class="flex items-start gap-4">
+                                <img src="../assets/default-avatar.png" alt="User" class="w-12 h-12 rounded-full">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">JavaScript Fundamentals</h4>
+                                            <p class="text-gray-600 text-sm">Learning session with Sarah Chen</p>
+                                            <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                <span><i class="fas fa-clock mr-1"></i>2:00 PM - 3:00 PM</span>
+                                                <span><i class="fas fa-video mr-1"></i>Online</span>
+                                                <span><i class="fas fa-tag mr-1"></i>Beginner Level</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button class="btn btn-success btn-sm">
+                                                <i class="fas fa-video mr-1"></i>
+                                                Join Meeting
+                                            </button>
+                                            <button onclick="rescheduleSession(1)" class="btn btn-outline btn-sm">
+                                                <i class="fas fa-calendar mr-1"></i>
+                                                Reschedule
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 p-3 bg-gray-50 rounded">
+                                        <p class="text-sm text-gray-700">
+                                            <strong>Session Plan:</strong> We'll cover variables, functions, and basic DOM manipulation.
+                                            Please have VS Code ready and a simple HTML file to practice with.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <select class="form-input form-select"
-                                style="width: auto"
-                                onchange="changeView(this.value)">
-                            <option value="month">Month View</option>
-                            <option value="week">Week View</option>
-                            <option value="day">Day View</option>
-                        </select>
+                    </div>
+
+                    <!-- Upcoming Sessions -->
+                    <div class="card">
+                        <h3 class="font-semibold text-gray-900 mb-4">This Week</h3>
+
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-start gap-4">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-12 h-12 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-900">Spanish Conversation Practice</h4>
+                                                <p class="text-gray-600 text-sm">Learning session with Maria Rodriguez</p>
+                                                <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                    <span><i class="fas fa-calendar mr-1"></i>Tomorrow, Jan 16</span>
+                                                    <span><i class="fas fa-clock mr-1"></i>10:00 AM - 11:00 AM</span>
+                                                    <span><i class="fas fa-language mr-1"></i>Intermediate</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button onclick="sendMessage('maria')" class="btn btn-outline btn-sm">
+                                                    <i class="fas fa-message mr-1"></i>
+                                                    Message
+                                                </button>
+                                                <button onclick="rescheduleSession(2)" class="btn btn-outline btn-sm">
+                                                    <i class="fas fa-calendar mr-1"></i>
+                                                    Reschedule
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-start gap-4">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-12 h-12 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-900">React Components Deep Dive</h4>
+                                                <p class="text-gray-600 text-sm">Teaching session for Alex Kim</p>
+                                                <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                    <span><i class="fas fa-calendar mr-1"></i>Friday, Jan 18</span>
+                                                    <span><i class="fas fa-clock mr-1"></i>3:00 PM - 4:30 PM</span>
+                                                    <span><i class="fas fa-chalkboard-teacher mr-1"></i>Teaching</span>
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button onclick="sendMessage('alex')" class="btn btn-outline btn-sm">
+                                                    <i class="fas fa-message mr-1"></i>
+                                                    Message
+                                                </button>
+                                                <button onclick="prepareSession(3)" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-edit mr-1"></i>
+                                                    Prepare
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="flex gap-6">
-                <!-- Main Calendar -->
-                <div class="flex-1">
+
+            <!-- Requests Tab -->
+            <div id="requestsContent" class="tab-content" style="display: none;">
+                <div class="grid grid-2 gap-6">
+                    <!-- Incoming Requests -->
                     <div class="card">
-                        <!-- Month View Calendar -->
-                        <div id="monthView">
-                            <div class="calendar-grid">
-                                <!-- Day Headers -->
-                                <div class="day-header">Sun</div>
-                                <div class="day-header">Mon</div>
-                                <div class="day-header">Tue</div>
-                                <div class="day-header">Wed</div>
-                                <div class="day-header">Thu</div>
-                                <div class="day-header">Fri</div>
-                                <div class="day-header">Sat</div>
-                                <!-- Calendar Days -->
-                                <div class="calendar-day other-month">
-                                    <span class="day-number">31</span>
+                        <div class="card-header">
+                            <h3 class="card-title">Incoming Requests</h3>
+                            <span class="text-sm text-gray-600">People who want to learn from you</span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-medium">Emma Wilson</h4>
+                                            <span class="text-xs text-gray-500">2 hours ago</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700 mb-2">
+                                            Wants to learn <strong>CSS Grid Layout</strong>
+                                        </p>
+                                        <p class="text-xs text-gray-600 mb-3">
+                                            "Hi! I'm a beginner developer and would love to learn CSS Grid from you.
+                                            I can teach you basic photography in return."
+                                        </p>
+                                        <div class="flex gap-2">
+                                            <button onclick="acceptRequest(1)" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check mr-1"></i>
+                                                Accept
+                                            </button>
+                                            <button onclick="declineRequest(1)" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-times mr-1"></i>
+                                                Decline
+                                            </button>
+                                            <button onclick="sendMessage('emma')" class="btn btn-outline btn-sm">
+                                                <i class="fas fa-message mr-1"></i>
+                                                Message
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">1</span>
+                            </div>
+
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-medium">Mike Chen</h4>
+                                            <span class="text-xs text-gray-500">1 day ago</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700 mb-2">
+                                            Wants to learn <strong>JavaScript ES6</strong>
+                                        </p>
+                                        <p class="text-xs text-gray-600 mb-3">
+                                            "I'm looking to level up my JavaScript skills, especially ES6 features.
+                                            I can help you with Python or data analysis."
+                                        </p>
+                                        <div class="flex gap-2">
+                                            <button onclick="acceptRequest(2)" class="btn btn-success btn-sm">
+                                                <i class="fas fa-check mr-1"></i>
+                                                Accept
+                                            </button>
+                                            <button onclick="declineRequest(2)" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-times mr-1"></i>
+                                                Decline
+                                            </button>
+                                            <button onclick="sendMessage('mike')" class="btn btn-outline btn-sm">
+                                                <i class="fas fa-message mr-1"></i>
+                                                Message
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Outgoing Requests -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Outgoing Requests</h3>
+                            <span class="text-sm text-gray-600">Your requests to learn from others</span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-medium">Lisa Park</h4>
+                                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Pending</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700 mb-2">
+                                            You want to learn <strong>Python Django</strong>
+                                        </p>
+                                        <p class="text-xs text-gray-600 mb-3">
+                                            Sent 3 hours ago • Offering JavaScript in return
+                                        </p>
+                                        <div class="flex gap-2">
+                                            <button onclick="cancelRequest(1)" class="btn btn-outline btn-sm">
+                                                <i class="fas fa-times mr-1"></i>
+                                                Cancel Request
+                                            </button>
+                                            <button onclick="sendMessage('lisa')" class="btn btn-outline btn-sm">
+                                                <i class="fas fa-message mr-1"></i>
+                                                Message
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">3</span>
+                            </div>
+
+                            <div class="border border-green-200 bg-green-50 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-medium">Tom Wilson</h4>
+                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Accepted</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700 mb-2">
+                                            You want to learn <strong>Photography Composition</strong>
+                                        </p>
+                                        <p class="text-xs text-gray-600 mb-3">
+                                            Accepted yesterday • Session scheduled for next week
+                                        </p>
+                                        <div class="flex gap-2">
+                                            <button onclick="viewSession(4)" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-calendar mr-1"></i>
+                                                View Session
+                                            </button>
+                                            <button onclick="sendMessage('tom')" class="btn btn-outline btn-sm">
+                                                <i class="fas fa-message mr-1"></i>
+                                                Message
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">4</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">5</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">6</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">7</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">8</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">9</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">10</span>
-                                    <div class="event-indicator bg-blue-500"></div>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">11</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">12</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">13</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">14</span>
-                                </div>
-                                <div class="calendar-day today" onclick="selectDate(15)">
-                                    <span class="day-number">15</span>
-                                    <div class="event-indicator bg-blue-500"></div>
-                                    <div class="event-indicator bg-green-400"></div>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">16</span>
-                                    <div class="event-indicator bg-blue-500"></div>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">17</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">18</span>
-                                    <div class="event-indicator bg-blue-500"></div>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">19</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">20</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">21</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">22</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">23</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">24</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">25</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">26</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">27</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">28</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">29</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">30</span>
-                                </div>
-                                <div class="calendar-day">
-                                    <span class="day-number">31</span>
-                                </div>
-                                <div class="calendar-day other-month">
-                                    <span class="day-number">1</span>
-                                </div>
-                                <div class="calendar-day other-month">
-                                    <span class="day-number">2</span>
-                                </div>
-                                <div class="calendar-day other-month">
-                                    <span class="day-number">3</span>
+                            </div>
+
+                            <div class="border border-red-200 bg-red-50 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <img src="../assets/default-avatar.png" alt="User" class="w-10 h-10 rounded-full">
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <h4 class="font-medium">Anna Kim</h4>
+                                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Declined</span>
+                                        </div>
+                                        <p class="text-sm text-gray-700 mb-2">
+                                            You wanted to learn <strong>UI/UX Design</strong>
+                                        </p>
+                                        <p class="text-xs text-gray-600 mb-3">
+                                            Declined 2 days ago • Schedule conflicts mentioned
+                                        </p>
+                                        <div class="flex gap-2">
+                                            <button onclick="findAlternative('ui-ux')" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-search mr-1"></i>
+                                                Find Alternative
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Sidebar -->
-                <div class="w-80 space-y-6">
-                    <!-- Today's Schedule -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Today's Schedule</h3>
-                            <span class="text-sm text-gray-600">January 15, 2024</span>
+            </div>
+
+            <!-- Session History Tab -->
+            <div id="historyContent" class="tab-content" style="display: none;">
+                <div class="card">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-semibold text-gray-900">Session History</h3>
+                        <div class="flex gap-3">
+                            <select class="form-input form-select" style="width: auto;">
+                                <option value="all">All Sessions</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                                <option value="teaching">Teaching</option>
+                                <option value="learning">Learning</option>
+                            </select>
+                            <select class="form-input form-select" style="width: auto;">
+                                <option value="recent">Most Recent</option>
+                                <option value="oldest">Oldest First</option>
+                                <option value="rating">Highest Rated</option>
+                            </select>
                         </div>
-                        <div class="space-y-3">
-                            <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                    <span class="font-medium text-sm">JavaScript Fundamentals</span>
-                                </div>
-                                <div class="text-xs text-gray-600 ml-5">
-                                    2:00 PM - 3:00 PM
-                                    <br />
-                                    Learning from Sarah Chen
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-start gap-4">
+                                <img src="../assets/default-avatar.png" alt="User" class="w-12 h-12 rounded-full">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Advanced React Patterns</h4>
+                                            <p class="text-gray-600 text-sm">Teaching session with Jennifer Lee</p>
+                                            <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                <span><i class="fas fa-calendar mr-1"></i>January 10, 2024</span>
+                                                <span><i class="fas fa-clock mr-1"></i>2 hours</span>
+                                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                                    <i class="fas fa-check mr-1"></i>Completed
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="flex items-center mb-2">
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <span class="ml-1 text-sm text-gray-600">5.0</span>
+                                            </div>
+                                            <button onclick="viewFeedback(1)" class="btn btn-outline btn-sm">
+                                                <i class="fas fa-comment mr-1"></i>
+                                                View Feedback
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                                    <span class="font-medium text-sm">Available</span>
-                                </div>
-                                <div class="text-xs text-gray-600 ml-5">
-                                    4:00 PM - 6:00 PM
-                                    <br />
-                                    Open for sessions
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-start gap-4">
+                                <img src="../assets/default-avatar.png" alt="User" class="w-12 h-12 rounded-full">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="font-semibold text-gray-900">Python Data Analysis</h4>
+                                            <p class="text-gray-600 text-sm">Learning session with David Zhang</p>
+                                            <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                <span><i class="fas fa-calendar mr-1"></i>January 8, 2024</span>
+                                                <span><i class="fas fa-clock mr-1"></i>1.5 hours</span>
+                                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                                    <i class="fas fa-check mr-1"></i>Completed
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="flex items-center mb-2">
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                <i class="fas fa-star text-gray-300 text-sm"></i>
+                                                <span class="ml-1 text-sm text-gray-600">4.5</span>
+                                            </div>
+                                            <button onclick="bookAgain('david')" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-redo mr-1"></i>
+                                                Book Again
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Quick Actions</h3>
-                        </div>
-                        <div class="space-y-3">
-                            <button onclick="openModal('quickAvailabilityModal')"
-                                    class="w-full btn btn-outline text-left">
-                                <i class="fas fa-plus mr-2"></i>
-                                Add Available Time
-                            </button>
-                            <button onclick="openModal('blockTimeModal')"
-                                    class="w-full btn btn-outline text-left">
-                                <i class="fas fa-ban mr-2"></i>
-                                Block Time Slot
-                            </button>
-                            <button onclick="copyScheduleLink()" class="w-full btn btn-outline text-left">
-                                <i class="fas fa-link mr-2"></i>
-                                Copy Schedule Link
-                            </button>
-                            <button onclick="exportCalendar()" class="w-full btn btn-outline text-left">
-                                <i class="fas fa-download mr-2"></i>
-                                Export to Calendar
-                            </button>
-                        </div>
+
+                    <div class="text-center py-8">
+                        <button class="btn btn-outline">
+                            <i class="fas fa-chevron-down mr-2"></i>
+                            Load More Sessions
+                        </button>
                     </div>
-                    <!-- Upcoming Sessions -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Upcoming Sessions</h3>
+                </div>
+            </div>
+
+            <!-- Pending Feedback Tab -->
+            <div id="feedbackContent" class="tab-content" style="display: none;">
+                <div class="card">
+                    <h3 class="font-semibold text-gray-900 mb-6">Sessions Awaiting Feedback</h3>
+
+                    <div class="space-y-6">
+                        <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-6">
+                            <div class="flex items-start gap-4">
+                                <img src="../assets/default-avatar.png" alt="User" class="w-12 h-12 rounded-full">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900 mb-2">CSS Flexbox Workshop</h4>
+                                    <p class="text-gray-600 text-sm mb-4">Learning session with Tom Wilson • Completed 2 days ago</p>
+
+                                    <form class="space-y-4">
+                                        <div>
+                                            <label class="form-label">Rate your session</label>
+                                            <div class="flex items-center gap-1">
+                                                <button type="button" onclick="setRating(1, 1)" class="star-rating" data-rating="1">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                                <button type="button" onclick="setRating(1, 2)" class="star-rating" data-rating="2">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                                <button type="button" onclick="setRating(1, 3)" class="star-rating" data-rating="3">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                                <button type="button" onclick="setRating(1, 4)" class="star-rating" data-rating="4">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                                <button type="button" onclick="setRating(1, 5)" class="star-rating" data-rating="5">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Share your experience</label>
+                                            <textarea class="form-input form-textarea" placeholder="How was your learning experience? What did you like most?"></textarea>
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-paper-plane mr-1"></i>
+                                                Submit Feedback
+                                            </button>
+                                            <button type="button" onclick="skipFeedback(1)" class="btn btn-outline">
+                                                Skip for now
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                        <div class="space-y-3">
-                            <div class="text-sm">
-                                <div class="font-medium text-gray-900">Tomorrow, 10:00 AM</div>
-                                <div class="text-gray-600">Spanish Conversation with Maria</div>
-                            </div>
-                            <div class="text-sm">
-                                <div class="font-medium text-gray-900">Friday, 3:00 PM</div>
-                                <div class="text-gray-600">Teaching React to Alex</div>
-                            </div>
-                            <div class="text-sm">
-                                <div class="font-medium text-gray-900">Next Week</div>
-                                <div class="text-gray-600">Photography with Tom</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Availability Summary -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">This Week's Availability</h3>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex justify-between text-sm">
-                                <span>Total Available Hours</span>
-                                <span class="font-semibold">12 hours</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span>Booked Sessions</span>
-                                <span class="font-semibold text-blue-600">5 hours</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span>Available for Booking</span>
-                                <span class="font-semibold text-green-600">7 hours</span>
+
+                        <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-6">
+                            <div class="flex items-start gap-4">
+                                <img src="../assets/default-avatar.png" alt="User" class="w-12 h-12 rounded-full">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-gray-900 mb-2">French Conversation Practice</h4>
+                                    <p class="text-gray-600 text-sm mb-4">Learning session with Sophie Martin • Completed 1 week ago</p>
+
+                                    <form class="space-y-4">
+                                        <div>
+                                            <label class="form-label">Rate your session</label>
+                                            <div class="flex items-center gap-1">
+                                                <button type="button" onclick="setRating(2, 1)" class="star-rating" data-rating="1">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                                <button type="button" onclick="setRating(2, 2)" class="star-rating" data-rating="2">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                                <button type="button" onclick="setRating(2, 3)" class="star-rating" data-rating="3">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                                <button type="button" onclick="setRating(2, 4)" class="star-rating" data-rating="4">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                                <button type="button" onclick="setRating(2, 5)" class="star-rating" data-rating="5">
+                                                    <i class="fas fa-star text-gray-300"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Share your experience</label>
+                                            <textarea class="form-input form-textarea" placeholder="How was your learning experience? What did you like most?"></textarea>
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-paper-plane mr-1"></i>
+                                                Submit Feedback
+                                            </button>
+                                            <button type="button" onclick="skipFeedback(2)" class="btn btn-outline">
+                                                Skip for now
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -295,409 +533,99 @@
             </div>
         </div>
     </main>
-    <!-- Set Availability Modal -->
-    <div id="availabilityModal" class="modal" style="display: none">
-        <div class="modal-overlay">
-            <div class="modal-content" style="max-width: 600px">
-                <div class="modal-header">
-                    <h3>Set Weekly Availability</h3>
-                    <button onclick="closeModal(document.getElementById('availabilityModal'))">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="space-y-6">
-                    <p class="text-gray-600">
-                        Set your regular weekly availability. You can always make changes for
-                        specific dates.
-                    </p>
-                    <div class="space-y-4">
-                        <!-- Monday -->
-                        <div class="flex items-center gap-4">
-                            <div class="w-20">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="mr-2" checked />
-                                    <span class="font-medium">Monday</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="time" class="form-input" value="09:00" style="width: 120px" />
-                                <span>to</span>
-                                <input type="time" class="form-input" value="17:00" style="width: 120px" />
-                            </div>
-                        </div>
-                        <!-- Tuesday -->
-                        <div class="flex items-center gap-4">
-                            <div class="w-20">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="mr-2" checked />
-                                    <span class="font-medium">Tuesday</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="time" class="form-input" value="09:00" style="width: 120px" />
-                                <span>to</span>
-                                <input type="time" class="form-input" value="17:00" style="width: 120px" />
-                            </div>
-                        </div>
-                        <!-- Wednesday -->
-                        <div class="flex items-center gap-4">
-                            <div class="w-20">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="mr-2" checked />
-                                    <span class="font-medium">Wednesday</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="time" class="form-input" value="09:00" style="width: 120px" />
-                                <span>to</span>
-                                <input type="time" class="form-input" value="17:00" style="width: 120px" />
-                            </div>
-                        </div>
-                        <!-- Thursday -->
-                        <div class="flex items-center gap-4">
-                            <div class="w-20">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="mr-2" checked />
-                                    <span class="font-medium">Thursday</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="time" class="form-input" value="09:00" style="width: 120px" />
-                                <span>to</span>
-                                <input type="time" class="form-input" value="17:00" style="width: 120px" />
-                            </div>
-                        </div>
-                        <!-- Friday -->
-                        <div class="flex items-center gap-4">
-                            <div class="w-20">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="mr-2" checked />
-                                    <span class="font-medium">Friday</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="time" class="form-input" value="09:00" style="width: 120px" />
-                                <span>to</span>
-                                <input type="time" class="form-input" value="17:00" style="width: 120px" />
-                            </div>
-                        </div>
-                        <!-- Saturday -->
-                        <div class="flex items-center gap-4">
-                            <div class="w-20">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="mr-2" />
-                                    <span class="font-medium">Saturday</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="time" class="form-input" value="10:00" style="width: 120px" />
-                                <span>to</span>
-                                <input type="time" class="form-input" value="14:00" style="width: 120px" />
-                            </div>
-                        </div>
-                        <!-- Sunday -->
-                        <div class="flex items-center gap-4">
-                            <div class="w-20">
-                                <label class="flex items-center">
-                                    <input type="checkbox" class="mr-2" />
-                                    <span class="font-medium">Sunday</span>
-                                </label>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <input type="time" class="form-input" value="10:00" style="width: 120px" />
-                                <span>to</span>
-                                <input type="time" class="form-input" value="14:00" style="width: 120px" />
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="form-label">Time Zone</label>
-                        <select class="form-input form-select">
-                            <option value="PST">Pacific Standard Time (PST)</option>
-                            <option value="MST">Mountain Standard Time (MST)</option>
-                            <option value="CST">Central Standard Time (CST)</option>
-                            <option value="EST">Eastern Standard Time (EST)</option>
-                        </select>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button class="btn btn-primary">Save Availability</button>
-                        <button onclick="closeModal(document.getElementById('availabilityModal'))"
-                                class="btn btn-secondary">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Block Time Modal -->
-    <div id="blockTimeModal" class="modal" style="display: none">
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Block Time Slot</h3>
-                    <button onclick="closeModal(document.getElementById('blockTimeModal'))">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="form-label">Date</label>
-                        <input type="date" class="form-input" value="2024-01-15" />
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="flex-1">
-                            <label class="form-label">Start Time</label>
-                            <input type="time" class="form-input" value="14:00" />
-                        </div>
-                        <div class="flex-1">
-                            <label class="form-label">End Time</label>
-                            <input type="time" class="form-input" value="16:00" />
-                        </div>
-                    </div>
-                    <div>
-                        <label class="form-label">Reason (Optional)</label>
-                        <input type="text"
-                               class="form-input"
-                               placeholder="e.g., Personal appointment, Break, etc." />
-                    </div>
-                    <div>
-                        <label class="flex items-center">
-                            <input type="checkbox" class="mr-2" />
-                            <span class="text-sm">Repeat weekly</span>
-                        </label>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button class="btn btn-primary">Block Time</button>
-                        <button onclick="closeModal(document.getElementById('blockTimeModal'))"
-                                class="btn btn-secondary">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Quick Availability Modal -->
-    <div id="quickAvailabilityModal" class="modal" style="display: none">
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add Available Time</h3>
-                    <button onclick="closeModal(document.getElementById('quickAvailabilityModal'))">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="form-label">Date</label>
-                        <input type="date" class="form-input" value="2024-01-15" />
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="flex-1">
-                            <label class="form-label">Start Time</label>
-                            <input type="time" class="form-input" value="16:00" />
-                        </div>
-                        <div class="flex-1">
-                            <label class="form-label">End Time</label>
-                            <input type="time" class="form-input" value="18:00" />
-                        </div>
-                    </div>
-                    <div>
-                        <label class="form-label">Skills Available For</label>
-                        <select class="form-input form-select" multiple style="height: 100px">
-                            <option value="javascript">JavaScript</option>
-                            <option value="react">React</option>
-                            <option value="css">CSS</option>
-                            <option value="nodejs">Node.js</option>
-                        </select>
-                        <div class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple skills</div>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button class="btn btn-primary">Add Availability</button>
-                        <button onclick="closeModal(document.getElementById('quickAvailabilityModal'))"
-                                class="btn btn-secondary">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="./main.js"></script>
     <script>
-  let currentDate = new Date();
+        
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
 
-  function changeMonth(direction) {
-    currentDate.setMonth(currentDate.getMonth() + direction);
-    updateMonthDisplay();
-  }
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
 
-  function goToToday() {
-    currentDate = new Date();
-    updateMonthDisplay();
-  }
+            // Show selected tab content and add active class
+            document.getElementById(tabName + 'Content').style.display = 'block';
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
 
-  function updateMonthDisplay() {
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    document.getElementById("currentMonth").textContent = `${
-      monthNames[currentDate.getMonth()]
-    } ${currentDate.getFullYear()}`;
-  }
+        function acceptRequest(requestId) {
+            alert(`Request ${requestId} accepted! Redirecting to scheduling...`);
+        }
 
-  function changeView(view) {
-    // Implementation for different calendar views
-    console.log(`Changing to ${view} view`);
-  }
-
-  function selectDate(day) {
-    alert(`Selected January ${day}, 2024`);
-  }
-
-  function openModal(modalId) {
-    document.getElementById(modalId).style.display = "flex";
-  }
-
-  function closeModal(modal) {
-    modal.style.display = "none";
-  }
-
-  function copyScheduleLink() {
-    navigator.clipboard.writeText("https://skillswap.com/schedule/john-doe");
-    alert("Schedule link copied to clipboard!");
-  }
-
-  function exportCalendar() {
-    alert("Exporting calendar to your default calendar app...");
-  }
-
-  // Add calendar-specific styles
-  const style = document.createElement("style");
-  style.textContent = `
-            .calendar-grid {
-                display: grid;
-                grid-template-columns: repeat(7, 1fr);
-                gap: 1px;
-                background: #e5e7eb;
-                border: 1px solid #e5e7eb;
-                border-radius: 8px;
-                overflow: hidden;
+        function declineRequest(requestId) {
+            if (confirm('Are you sure you want to decline this request?')) {
+                alert(`Request ${requestId} declined.`);
             }
+        }
 
-            .day-header {
-                background: #f9fafb;
-                padding: 12px 8px;
-                text-align: center;
-                font-weight: 600;
-                font-size: 0.875rem;
+        function cancelRequest(requestId) {
+            if (confirm('Are you sure you want to cancel this request?')) {
+                alert(`Request ${requestId} cancelled.`);
+            }
+        }
+
+        function rescheduleSession(sessionId) {
+            alert(`Opening reschedule dialog for session ${sessionId}...`);
+        }
+
+        function prepareSession(sessionId) {
+            alert(`Opening session preparation for session ${sessionId}...`);
+        }
+
+        function sendMessage(userId) {
+            alert(`Opening chat with ${userId}...`);
+        }
+
+        function setRating(sessionId, rating) {
+            const sessionRatings = document.querySelectorAll(`[onclick*="setRating(${sessionId}"]`);
+            sessionRatings.forEach((star, index) => {
+                const icon = star.querySelector('i');
+                if (index < rating) {
+                    icon.className = 'fas fa-star text-yellow-400';
+                } else {
+                    icon.className = 'fas fa-star text-gray-300';
+                }
+            });
+        }
+
+        function skipFeedback(sessionId) {
+            if (confirm('Skip feedback for this session? You can provide it later.')) {
+                alert(`Feedback skipped for session ${sessionId}.`);
+            }
+        }
+
+        // Add styles for tab buttons
+        const style = document.createElement('style');
+        style.textContent = `
+            .tab-button {
+                padding: 12px 24px;
+                border: none;
+                background: none;
                 color: #6b7280;
-            }
-
-            .calendar-day {
-                background: white;
-                min-height: 100px;
-                padding: 8px;
-                position: relative;
-                cursor: pointer;
-                transition: background-color 0.2s;
-            }
-
-            .calendar-day:hover {
-                background: #f9fafb;
-            }
-
-            .calendar-day.today {
-                background: #dbeafe;
-            }
-
-            .calendar-day.other-month {
-                background: #f9fafb;
-                color: #9ca3af;
-            }
-
-            .day-number {
                 font-weight: 500;
-                font-size: 0.875rem;
-            }
-
-            .event-indicator {
-                position: absolute;
-                bottom: 4px;
-                left: 4px;
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                margin-right: 2px;
-                display: inline-block;
-            }
-
-            .event-indicator + .event-indicator {
-                left: 12px;
-            }
-
-            .modal {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
+                cursor: pointer;
+                border-bottom: 2px solid transparent;
+                transition: all 0.3s ease;
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                z-index: 1000;
             }
-
-            .modal-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
+            .tab-button:hover {
+                color: #3b82f6;
             }
-
-            .modal-content {
-                background: white;
-                border-radius: 12px;
-                padding: 24px;
-                max-width: 500px;
-                width: 90%;
-                max-height: 90vh;
-                overflow-y: auto;
-                position: relative;
-                z-index: 1001;
+            .tab-button.active {
+                color: #3b82f6;
+                border-bottom-color: #3b82f6;
             }
-
-            .modal-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 24px;
-                padding-bottom: 16px;
-                border-bottom: 1px solid #e5e7eb;
-            }
-
-            .modal-header h3 {
-                font-size: 1.25rem;
-                font-weight: 600;
-                color: #1f2937;
-            }
-
-            .modal-header button {
+            .star-rating {
                 background: none;
                 border: none;
-                color: #6b7280;
                 cursor: pointer;
-                font-size: 1.25rem;
+                padding: 2px;
             }
         `;
-  document.head.appendChild(style);
+        document.head.appendChild(style);
     </script>
 {% endblock content %}
