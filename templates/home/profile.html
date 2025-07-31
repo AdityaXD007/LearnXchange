@@ -18,33 +18,28 @@
                         <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="profile-image-container">
-                                <form method="POST" enctype="multipart/form-data">
-                                    {% csrf_token %}
-                                    {% if profile.image %}
-                                        <img id="profileImage"
-                                             src="{{ profile.image.url }}"
-                                             alt=""
-                                             class="profile-image" />
-                                        <!-- Edit overlay for existing images -->
-                                        <label for="profileImageInput" class="edit-overlay">
-                                            <i class="fas fa-camera"></i>
-                                        </label>
-                                    {% else %}
-                                        <img id="profileImage"
-                                             src="{% static 'img/default-avatar.png' %}"
-                                             alt=""
-                                             class="profile-image" />
-                                        <!-- Plus overlay for no image -->
-                                        <label for="profileImageInput" class="upload-overlay">
-                                            <span class="plus-icon">+</span>
-                                        </label>
-                                    {% endif %}
-                                    <input type="file"
-                                           name="image"
-                                           id="profileImageInput"
-                                           accept="image/*"
-                                           onchange="this.form.submit()">
-                                </form>
+                                {% if profile.image %}
+                                    <img id="profileImage"
+                                         src="{{ profile.image.url }}"
+                                         alt=""
+                                         class="profile-image" />
+                                    <label for="profileImageInput" class="edit-overlay">
+                                        <i class="fas fa-camera"></i>
+                                    </label>
+                                {% else %}
+                                    <img id="profileImage"
+                                         src="{% static 'img/default-avatar.png' %}"
+                                         alt=""
+                                         class="profile-image" />
+                                    <label for="profileImageInput" class="upload-overlay">
+                                        <span class="plus-icon">+</span>
+                                    </label>
+                                {% endif %}
+                                <input type="file"
+                                       name="image"
+                                       id="profileImageInput"
+                                       accept="image/*"
+                                       onchange="this.form.submit()">
                             </div>
                         </form>
                         <h3 class="text-xl font-semibold text-gray-900 mb-1">{{ user.username }}</h3>
@@ -210,57 +205,54 @@
                         </div>
                     </div>
                     <div class="space-y-3" id="teachingSkills">
-                        <div class="skill-item">
-                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <i class="fab fa-js-square text-yellow-500 text-xl"></i>
-                                    <div>
-                                        <div class="font-medium">JavaScript</div>
-                                        <div class="text-sm text-gray-600">Expert • 15 sessions taught</div>
+                        {% if teaching_skills %}
+                            {% for user_skill in teaching_skills %}
+                                <div class="skill-item" data-skill-id="{{ user_skill.id }}">
+                                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                        <div class="flex items-center gap-3">
+                                            <i class="{{ user_skill.skill.icon_class }} {{ user_skill.skill.color_class }} text-xl"></i>
+                                            <div>
+                                                <div class="font-medium">{{ user_skill.skill.name }}</div>
+                                                <div class="text-sm text-gray-600">
+                                                    {{ user_skill.get_proficiency_level_display }} • {{ user_skill.get_sessions_text }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <select onchange="updateSkillStatus({{ user_skill.id }}, this.value)"
+                                                    class="skill-status {{ user_skill.get_status_color }} px-2 py-1 rounded text-xs border-0">
+                                                {% for status_value, status_label in user_skill.STATUS_CHOICES %}
+                                                    <option value="{{ status_value }}"
+                                                            {% if user_skill.status == status_value %}selected{% endif %}>
+                                                        {{ status_label }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button onclick="updateSessionsCount({{ user_skill.id }}, 1)"
+                                                    class="text-green-600 hover:text-green-800 text-sm"
+                                                    title="Add session">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <form method="post"
+                                                  action="{% url 'remove_skill' user_skill.id %}"
+                                                  style="display: inline"
+                                                  onsubmit="return confirm('Remove this skill?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-gray-400 hover:text-red-600">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Active</span>
-                                    <button class="text-gray-400 hover:text-red-600">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-gray-500 py-8">
+                                <i class="fas fa-chalkboard-teacher text-3xl mb-2"></i>
+                                <p>No teaching skills added yet</p>
+                                <p class="text-sm">Click "Add Skill" to get started</p>
                             </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <i class="fab fa-react text-blue-500 text-xl"></i>
-                                    <div>
-                                        <div class="font-medium">React</div>
-                                        <div class="text-sm text-gray-600">Advanced • 8 sessions taught</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Active</span>
-                                    <button class="text-gray-400 hover:text-red-600">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <i class="fab fa-css3-alt text-blue-600 text-xl"></i>
-                                    <div>
-                                        <div class="font-medium">CSS</div>
-                                        <div class="text-sm text-gray-600">Expert • 12 sessions taught</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Active</span>
-                                    <button class="text-gray-400 hover:text-red-600">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
                 <!-- Learning Skills -->
@@ -276,59 +268,212 @@
                         </div>
                     </div>
                     <div class="space-y-3" id="learningSkills">
-                        <div class="skill-item">
-                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <i class="fab fa-python text-blue-500 text-xl"></i>
-                                    <div>
-                                        <div class="font-medium">Python</div>
-                                        <div class="text-sm text-gray-600">Beginner • 3 sessions completed</div>
+                        {% if learning_skills %}
+                            {% for user_skill in learning_skills %}
+                                <div class="skill-item" data-skill-id="{{ user_skill.id }}">
+                                    <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                        <div class="flex items-center gap-3">
+                                            <i class="{{ user_skill.skill.icon_class }} {{ user_skill.skill.color_class }} text-xl"></i>
+                                            <div>
+                                                <div class="font-medium">{{ user_skill.skill.name }}</div>
+                                                <div class="text-sm text-gray-600">
+                                                    {{ user_skill.get_proficiency_level_display }} • {{ user_skill.get_sessions_text }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <select onchange="updateSkillStatus({{ user_skill.id }}, this.value)"
+                                                    class="skill-status {{ user_skill.get_status_color }} px-2 py-1 rounded text-xs border-0">
+                                                {% for status_value, status_label in user_skill.STATUS_CHOICES %}
+                                                    <option value="{{ status_value }}"
+                                                            {% if user_skill.status == status_value %}selected{% endif %}>
+                                                        {{ status_label }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                            <button onclick="updateSessionsCount({{ user_skill.id }}, 1)"
+                                                    class="text-green-600 hover:text-green-800 text-sm"
+                                                    title="Add session">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <form method="post"
+                                                  action="{% url 'remove_skill' user_skill.id %}"
+                                                  style="display: inline"
+                                                  onsubmit="return confirm('Remove this skill?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-gray-400 hover:text-red-600">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Learning</span>
-                                    <button class="text-gray-400 hover:text-red-600">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-gray-500 py-8">
+                                <i class="fas fa-graduation-cap text-3xl mb-2"></i>
+                                <p>No learning goals added yet</p>
+                                <p class="text-sm">Click "Add Skill" to start learning</p>
                             </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-language text-green-500 text-xl"></i>
-                                    <div>
-                                        <div class="font-medium">Spanish</div>
-                                        <div class="text-sm text-gray-600">Intermediate • 6 sessions completed</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">In
-                                    Progress</span>
-                                    <button class="text-gray-400 hover:text-red-600">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                                <div class="flex items-center gap-3">
-                                    <i class="fas fa-camera text-purple-500 text-xl"></i>
-                                    <div>
-                                        <div class="font-medium">Photography</div>
-                                        <div class="text-sm text-gray-600">Beginner • Just started</div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">New</span>
-                                    <button class="text-gray-400 hover:text-red-600">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        {% endif %}
                     </div>
+                </div>
+            </div>
+            <!-- Add Teaching Skill Modal -->
+            <div id="addTeachingSkillModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Add Teaching Skill</h4>
+                        <button onclick="closeModal('addTeachingSkillModal')" class="close">&times;</button>
+                    </div>
+                    <form method="post" action="{% url 'add_skill' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="skill_type" value="teaching">
+                        <div class="form-group">
+                            <label for="teaching_skill_select">Choose a Skill:</label>
+                            <select name="skill_id"
+                                    id="teaching_skill_select"
+                                    class="form-control"
+                                    required>
+                                <option value="">Select a skill...</option>
+                                {% for skill in all_skills %}<option value="{{ skill.id }}">{{ skill.name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="teaching_proficiency">Your Proficiency Level:</label>
+                            <select name="proficiency_level"
+                                    id="teaching_proficiency"
+                                    class="form-control"
+                                    required>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="teaching_status">Status:</label>
+                            <select name="status" id="teaching_status" class="form-control">
+                                <option value="active">Active</option>
+                                <option value="paused">Paused</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    onclick="closeModal('addTeachingSkillModal')"
+                                    class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Skill</button>
+                        </div>
+                    </form>
+                    <hr class="my-4">
+                    <!-- Custom Skill Form -->
+                    <h5>Or Create a New Skill:</h5>
+                    <form method="post" action="{% url 'create_custom_skill' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="skill_type" value="teaching">
+                        <div class="form-group">
+                            <label for="custom_teaching_skill">Skill Name:</label>
+                            <input type="text"
+                                   name="skill_name"
+                                   id="custom_teaching_skill"
+                                   class="form-control"
+                                   placeholder="e.g., Machine Learning"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="custom_teaching_proficiency">Your Proficiency Level:</label>
+                            <select name="proficiency_level"
+                                    id="custom_teaching_proficiency"
+                                    class="form-control"
+                                    required>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                                <option value="expert">Expert</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Create & Add Skill</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Add Learning Skill Modal -->
+            <div id="addLearningSkillModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Add Learning Goal</h4>
+                        <button onclick="closeModal('addLearningSkillModal')" class="close">&times;</button>
+                    </div>
+                    <form method="post" action="{% url 'add_skill' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="skill_type" value="learning">
+                        <div class="form-group">
+                            <label for="learning_skill_select">Choose a Skill:</label>
+                            <select name="skill_id"
+                                    id="learning_skill_select"
+                                    class="form-control"
+                                    required>
+                                <option value="">Select a skill...</option>
+                                {% for skill in all_skills %}<option value="{{ skill.id }}">{{ skill.name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="learning_proficiency">Current Level:</label>
+                            <select name="proficiency_level"
+                                    id="learning_proficiency"
+                                    class="form-control"
+                                    required>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="learning_status">Status:</label>
+                            <select name="status" id="learning_status" class="form-control">
+                                <option value="new">New</option>
+                                <option value="learning">Learning</option>
+                                <option value="in_progress">In Progress</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button"
+                                    onclick="closeModal('addLearningSkillModal')"
+                                    class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Goal</button>
+                        </div>
+                    </form>
+                    <hr class="my-4">
+                    <!-- Custom Skill Form -->
+                    <h5>Or Create a New Skill:</h5>
+                    <form method="post" action="{% url 'create_custom_skill' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="skill_type" value="learning">
+                        <div class="form-group">
+                            <label for="custom_learning_skill">Skill Name:</label>
+                            <input type="text"
+                                   name="skill_name"
+                                   id="custom_learning_skill"
+                                   class="form-control"
+                                   placeholder="e.g., Data Science"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="custom_learning_proficiency">Current Level:</label>
+                            <select name="proficiency_level"
+                                    id="custom_learning_proficiency"
+                                    class="form-control"
+                                    required>
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Create & Add Goal</button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <!-- Reviews Section -->

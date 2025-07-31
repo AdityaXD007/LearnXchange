@@ -12,7 +12,7 @@
             <a href="{% url 'sessions' %}" class="nav-link">Sessions</a>
             <a href="{% url 'calendar' %}" class="nav-link">Calendar</a>
             <a href="{% url 'profile' %}" class="nav-link">Profile</a>
-        </div>
+        </div>``
         <!-- Auth Buttons or User Dropdown -->
         {% if user.is_authenticated %}
             <div class="user-dropdown">
@@ -36,16 +36,15 @@
                 <a href="{% url 'login' %}">
                     <button class="btn btn-outline" id="login-btn">Log in</button>
                 </a>
-
                 <a href="{% url 'signup' %}">
-                <button class="btn btn-primary" id="signup-btn">Sign up</button>
+                    <button class="btn btn-primary" id="signup-btn">Sign up</button>
                 </a>
             </div>
-    {% endif %}
-    <div class="nav-toggle" id="menu-toggle">
-        <i class="fas fa-bars"></i>
+        {% endif %}
+        <div class="nav-toggle" id="menu-toggle">
+            <i class="fas fa-bars"></i>
+        </div>
     </div>
-</div>
 </div>
 </nav>
 <script>

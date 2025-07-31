@@ -522,3 +522,126 @@ function timeAgo(dateString) {
     return `${Math.floor(diffInSeconds / 3600)} hours ago`;
   return `${Math.floor(diffInSeconds / 86400)} days ago`;
 }
+
+// Modal functions
+function openModal(modalId) {
+  console.log("Opening modal:", modalId);
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = "block";
+    modal.classList.add("show");
+    // Prevent body scrolling when modal is open
+    document.body.style.overflow = "hidden";
+  } else {
+    console.error("Modal not found:", modalId);
+  }
+}
+
+function closeModal(modalId) {
+  console.log("Closing modal:", modalId);
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = "none";
+    modal.classList.remove("show");
+    // Restore body scrolling
+    document.body.style.overflow = "auto";
+  }
+}
+
+// Update skill status via AJAX
+function updateSkillStatus(skillId, newStatus) {
+  fetch('{% url "update_skill_status" %}', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      skill_id: skillId,
+      status: newStatus,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        // Update the select element's classes
+        const selectElement = document.querySelector(
+          `[data-skill-id="${skillId}"] .skill-status`
+        );
+        if (selectElement) {
+          selectElement.className = `skill-status ${data.new_status_color} px-2 py-1 rounded text-xs border-0`;
+        }
+      } else {
+        alert("Error updating status: " + data.message);
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("Error updating status");
+    });
+}
+
+// Update sessions count via AJAX
+function updateSessionsCount(skillId, increment) {
+  fetch('{% url "update_sessions_count" %}', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      skill_id: skillId,
+      increment: increment,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        // Update the sessions text in the DOM
+        const skillItem = document.querySelector(
+          `[data-skill-id="${skillId}"]`
+        );
+        if (skillItem) {
+          const sessionsText = skillItem.querySelector(
+            ".text-sm.text-gray-600"
+          );
+          if (sessionsText) {
+            const proficiencyText = sessionsText.textContent.split(" • ")[0];
+            sessionsText.textContent = `${proficiencyText} • ${data.sessions_text}`;
+          }
+        }
+      } else {
+        alert("Error updating sessions: " + data.message);
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("Error updating sessions");
+    });
+}
+
+// More specific event handling to avoid conflicts with navbar
+document.addEventListener("click", function (event) {
+  // Only handle modal-related clicks, ignore navigation clicks
+  if (event.target.classList.contains("modal")) {
+    event.target.style.display = "none";
+    event.target.classList.remove("show");
+    document.body.style.overflow = "auto";
+  }
+});
+
+// Close modal with Escape key
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    const modals = document.querySelectorAll(".modal.show");
+    modals.forEach((modal) => {
+      modal.style.display = "none";
+      modal.classList.remove("show");
+      document.body.style.overflow = "auto";
+    });
+  }
+});
+
+// Test function - you can remove this later
+function testModal() {
+  console.log("Testing modal...");
+  openModal("addTeachingSkillModal");
+}
