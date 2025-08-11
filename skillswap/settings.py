@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     #Apps
     'home.apps.HomeConfig',
     'user.apps.UserConfig',
+    'match.apps.MatchConfig',
 ]
 
 MIDDLEWARE = [

@@ -11,18 +11,19 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 
 # Create your views here.
+
 def index(request):
     return render(request, 'home/index.html')
 
+@login_required
 def dashboard(request):
     return render(request, 'home/dashboard.html')
 
-def matching(request):
-    return render(request, 'home/matching.html')
-
+@login_required
 def sessions(request):
     return render(request, 'home/sessions.html')
 
+@login_required
 def calendar(request):
     return render(request, 'home/calendar.html')
 

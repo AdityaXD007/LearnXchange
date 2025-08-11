@@ -242,7 +242,7 @@ def login_view(request):
     
     # Handle GET request
     next_url = request.GET.get('next', '')
-    return render(request, 'home/login.html', {'next': next_url})
+    return render(request, 'accounts/login.html', {'next': next_url})
 
 def signup_view(request):
     if request.method == 'POST':
@@ -261,7 +261,7 @@ def signup_view(request):
     else:
         form = UserCreationForm()
     
-    return render(request, 'home/signup.html', {'form': form})
+    return render(request, 'accounts/signup.html', {'form': form})
 
 def logout_view(request):
     logout(request)  # logs out on both GET and POST
