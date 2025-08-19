@@ -1,4 +1,6 @@
 {% extends "base/base.html" %}
+{% load static %}
+
 {% block content %}
     <!-- Main Content -->
     <main class="main-content">
@@ -12,76 +14,82 @@
         <div class="container">
             <!-- Search and Filters -->
             <div class="card mb-6">
-                <div class="flex flex-col lg:flex-row gap-4">
-                    <div class="flex-1">
-                        <div class="relative">
-                            <input type="text"
-                                   placeholder="Search for skills, users, or keywords..."
-                                   class="form-input pl-10"
-                                   id="searchInput">
-                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <form method="GET" action="{% url 'matching' %}">
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <div class="flex-1">
+                            <div class="relative">
+                                <input type="text"
+                                       name="search"
+                                       value="{{ search_query }}"
+                                       placeholder="Search for skills, users, or keywords..."
+                                       class="form-input pl-10"
+                                       id="searchInput">
+                                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <select class="form-input form-select" name="skill_filter" id="skillFilter">
+                                <option value="">All Skills</option>
+                                {% for skill in all_skills %}
+                                    <option value="{{ skill.name }}" {% if skill_filter == skill.name %}selected{% endif %}>
+                                        {{ skill.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <select class="form-input form-select" name="level_filter" id="levelFilter">
+                                <option value="">All Levels</option>
+                                <option value="beginner" {% if level_filter == 'beginner' %}selected{% endif %}>Beginner</option>
+                                <option value="intermediate" {% if level_filter == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                                <option value="advanced" {% if level_filter == 'advanced' %}selected{% endif %}>Advanced</option>
+                                <option value="expert" {% if level_filter == 'expert' %}selected{% endif %}>Expert</option>
+                            </select>
+                            <button type="button" class="btn btn-outline" onclick="toggleFilters()">
+                                <i class="fas fa-filter mr-2"></i>
+                                Filters
+                            </button>
                         </div>
                     </div>
-                    <div class="flex gap-3">
-                        <select class="form-input form-select" id="skillFilter">
-                            <option value="">All Skills</option>
-                            <option value="javascript">JavaScript</option>
-                            <option value="python">Python</option>
-                            <option value="react">React</option>
-                            <option value="css">CSS</option>
-                            <option value="photography">Photography</option>
-                            <option value="spanish">Spanish</option>
-                            <option value="design">Design</option>
-                        </select>
-                        <select class="form-input form-select" id="levelFilter">
-                            <option value="">All Levels</option>
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                            <option value="expert">Expert</option>
-                        </select>
-                        <button class="btn btn-outline" onclick="toggleFilters()">
-                            <i class="fas fa-filter mr-2"></i>
-                            Filters
-                        </button>
-                    </div>
-                </div>
-                <!-- Advanced Filters (Hidden by default) -->
-                <div id="advancedFilters"
-                     class="mt-4 pt-4 border-t border-gray-200"
-                     style="display: none">
-                    <div class="grid grid-3 gap-4">
-                        <div>
-                            <label class="form-label">Availability</label>
-                            <select class="form-input form-select">
-                                <option value="">Any time</option>
-                                <option value="morning">Morning (6AM - 12PM)</option>
-                                <option value="afternoon">Afternoon (12PM - 6PM)</option>
-                                <option value="evening">Evening (6PM - 10PM)</option>
-                                <option value="weekend">Weekends</option>
-                            </select>
+                    
+                    <!-- Advanced Filters (Hidden by default) -->
+                    <div id="advancedFilters" class="mt-4 pt-4 border-t border-gray-200" style="display: none">
+                        <div class="grid grid-3 gap-4">
+                            <div>
+                                <label class="form-label">Availability</label>
+                                <select class="form-input form-select" name="availability">
+                                    <option value="">Any time</option>
+                                    <option value="morning">Morning (6AM - 12PM)</option>
+                                    <option value="afternoon">Afternoon (12PM - 6PM)</option>
+                                    <option value="evening">Evening (6PM - 10PM)</option>
+                                    <option value="weekend">Weekends</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Rating</label>
+                                <select class="form-input form-select" name="rating">
+                                    <option value="">Any rating</option>
+                                    <option value="4.5">4.5+ stars</option>
+                                    <option value="4.0">4.0+ stars</option>
+                                    <option value="3.5">3.5+ stars</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Session Type</label>
+                                <select class="form-input form-select" name="session_type">
+                                    <option value="">Any type</option>
+                                    <option value="one-on-one">One-on-One</option>
+                                    <option value="group">Group Sessions</option>
+                                    <option value="workshop">Workshops</option>
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <label class="form-label">Rating</label>
-                            <select class="form-input form-select">
-                                <option value="">Any rating</option>
-                                <option value="4.5">4.5+ stars</option>
-                                <option value="4.0">4.0+ stars</option>
-                                <option value="3.5">3.5+ stars</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="form-label">Session Type</label>
-                            <select class="form-input form-select">
-                                <option value="">Any type</option>
-                                <option value="one-on-one">One-on-One</option>
-                                <option value="group">Group Sessions</option>
-                                <option value="workshop">Workshops</option>
-                            </select>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary mr-2">Apply Filters</button>
+                            <a href="{% url 'matching' %}" class="btn btn-secondary">Clear All</a>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
+            
             <!-- Match Results -->
             <div class="flex gap-6">
                 <!-- Sidebar with Quick Stats -->
@@ -91,273 +99,185 @@
                         <div class="space-y-3">
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Total Matches</span>
-                                <span class="font-semibold">47</span>
+                                <span class="font-semibold">{{ total_matches }}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Perfect Matches</span>
-                                <span class="font-semibold text-green-600">12</span>
+                                <span class="font-semibold text-green-600">{{ perfect_matches }}</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">Online Now</span>
-                                <span class="font-semibold text-blue-600">8</span>
+                                <span class="font-semibold text-blue-600">{{ online_now }}</span>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="card">
                         <h3 class="font-semibold text-gray-900 mb-3">Popular Skills</h3>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-sm">
-                                <span>JavaScript</span>
-                                <span class="text-gray-500">23</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span>Python</span>
-                                <span class="text-gray-500">18</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span>Design</span>
-                                <span class="text-gray-500">15</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span>Spanish</span>
-                                <span class="text-gray-500">12</span>
-                            </div>
+                            {% for skill in popular_skills %}
+                                <div class="flex justify-between text-sm">
+                                    <span>{{ skill.name }}</span>
+                                    <span class="text-gray-500">{{ skill.user_count }}</span>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
+                
                 <!-- Main Results -->
                 <div class="flex-1">
                     <!-- Sort Options -->
                     <div class="flex justify-between items-center mb-4">
                         <div class="text-gray-600">
-                            Showing <span class="font-semibold">47 matches</span> • Sorted by relevance
+                            Showing <span class="font-semibold">{{ total_matches }} matches</span> • Sorted by {{ sort_by|title }}
                         </div>
-                        <select class="form-input form-select" style="width: auto;">
-                            <option value="relevance">Best Match</option>
-                            <option value="rating">Highest Rated</option>
-                            <option value="sessions">Most Sessions</option>
-                            <option value="recent">Recently Active</option>
-                        </select>
+                        <form method="GET" class="inline">
+                            <!-- Preserve existing filters -->
+                            {% for key, value in request.GET.items %}
+                                {% if key != 'sort' %}
+                                    <input type="hidden" name="{{ key }}" value="{{ value }}">
+                                {% endif %}
+                            {% endfor %}
+                            <select class="form-input form-select" style="width: auto;" name="sort" onchange="this.form.submit()">
+                                <option value="relevance" {% if sort_by == 'relevance' %}selected{% endif %}>Best Match</option>
+                                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Highest Rated</option>
+                                <option value="sessions" {% if sort_by == 'sessions' %}selected{% endif %}>Most Sessions</option>
+                                <option value="recent" {% if sort_by == 'recent' %}selected{% endif %}>Recently Active</option>
+                            </select>
+                        </form>
                     </div>
+                    
                     <!-- Match Cards -->
                     <div class="space-y-4">
-                        <!-- Perfect Match -->
-                        <div class="card border-green-200 bg-green-50">
-                            <div class="flex items-start gap-4">
-                                <div class="relative">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-16 h-16 rounded-full">
-                                    <div class="absolute -top-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-start justify-between">
-                                        <div>
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <h3 class="font-semibold text-gray-900">Sarah Chen</h3>
-                                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                                                    <i class="fas fa-star mr-1"></i>
-                                                    Perfect Match
-                                                </span>
-                                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Online</span>
-                                            </div>
-                                            <div class="flex items-center gap-1 mb-2">
-                                                <div class="flex items-center">
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                        {% for match in matches %}
+                            <div class="card {% if match.perfect_match %}border-green-200 bg-green-50{% endif %}">
+                                <div class="flex items-start gap-4">
+                                    <div class="relative" style="width: 64px; height: 64px; flex-shrink: 0;">
+                                        <img src="{% if match.user.profile.image %}{{ match.user.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                            alt="{{ match.user.profile.full_name|default:match.user.username }}"
+                                            style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; display: block;">
+                                        <div style="position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; background-color: {% if match.is_online %}#10b981{% else %}#9ca3af{% endif %};"></div>
+                                    </div>
+                                    
+                                    <div class="flex-1">
+                                        <div class="flex items-start justify-between">
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <h3 class="font-semibold text-gray-900">
+                                                        {{ match.user.profile.full_name|default:match.user.username }}
+                                                    </h3>
+                                                    
+                                                    {% if match.perfect_match %}
+                                                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                                                            <i class="fas fa-star mr-1"></i>
+                                                            Perfect Match
+                                                        </span>
+                                                    {% endif %}
+                                                    
+                                                    {% if match.is_online %}
+                                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Online</span>
+                                                    {% else %}
+                                                        <span class="text-gray-500 text-sm">• Last seen {{ match.user.last_login|timesince }} ago</span>
+                                                    {% endif %}
                                                 </div>
-                                                <span class="text-sm text-gray-600 ml-1">4.9 (34 reviews)</span>
-                                            </div>
-                                            <p class="text-gray-700 text-sm mb-3">
-                                                Senior frontend developer specializing in React and modern JavaScript.
-                                                Looking to learn Python for backend development.
-                                            </p>
-                                            <div class="flex flex-wrap gap-2 mb-3">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-green-700 font-medium">Teaches:</span>
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">React</span>
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">JavaScript</span>
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">CSS</span>
+                                                
+                                                <div class="flex items-center gap-1 mb-2">
+                                                    <div class="flex items-center">
+                                                        {% with rating=match.user.profile.rating %}
+                                                            {% for i in "12345" %}
+                                                                {% if forloop.counter <= rating %}
+                                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                                {% else %}
+                                                                    <i class="fas fa-star text-gray-300 text-sm"></i>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endwith %}
+                                                    </div>
+                                                    <span class="text-sm text-gray-600 ml-1">
+                                                        {{ match.user.profile.rating|floatformat:1 }} ({{ match.user.profile.sessions }} reviews)
+                                                    </span>
                                                 </div>
+                                                
+                                                <p class="text-gray-700 text-sm mb-3">
+                                                    {{ match.user.profile.bio|default:"No bio available yet." }}
+                                                </p>
+                                                
+                                                {% if match.teaching_skills %}
+                                                    <div class="flex flex-wrap gap-2 mb-3">
+                                                        <div class="flex items-center gap-1">
+                                                            <span class="text-xs text-green-700 font-medium">Teaches:</span>
+                                                            {% for skill in match.teaching_skills %}
+                                                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                                                                    {{ skill.skill.name }}
+                                                                </span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                {% if match.learning_skills %}
+                                                    <div class="flex flex-wrap gap-2">
+                                                        <div class="flex items-center gap-1">
+                                                            <span class="text-xs text-purple-700 font-medium">Wants to learn:</span>
+                                                            {% for skill in match.learning_skills %}
+                                                                <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
+                                                                    {{ skill.skill.name }}
+                                                                </span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
                                             </div>
-                                            <div class="flex flex-wrap gap-2">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-purple-700 font-medium">Wants to
-                                                    learn:</span>
-                                                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Python</span>
-                                                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Node.js</span>
+                                            
+                                            <div class="text-right">
+                                                <div class="text-2xl font-bold {% if match.perfect_match %}text-green-600{% else %}text-blue-600{% endif %} mb-1">
+                                                    {{ match.score }}%
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="text-2xl font-bold text-green-600 mb-1">95%</div>
-                                            <div class="text-xs text-gray-500 mb-3">Match Score</div>
-                                            <div class="space-y-2">
-                                                <button onclick="requestSession('sarah-chen')"
-                                                        class="btn btn-primary btn-sm w-full">
-                                                    <i class="fas fa-calendar-plus mr-1"></i>
-                                                    Request Session
-                                                </button>
-                                                <button onclick="sendMessage('sarah-chen')"
-                                                        class="btn btn-outline btn-sm w-full">
-                                                    <i class="fas fa-message mr-1"></i>
-                                                    Send Message
-                                                </button>
+                                                <div class="text-xs text-gray-500 mb-3">Match Score</div>
+                                                <div class="space-y-2">
+                                                    <button onclick="requestSession('{{ match.user.username }}')"
+                                                            class="btn btn-primary btn-sm w-full">
+                                                        <i class="fas fa-calendar-plus mr-1"></i>
+                                                        Request Session
+                                                    </button>
+                                                    <button onclick="sendMessage('{{ match.user.username }}')"
+                                                            class="btn btn-outline btn-sm w-full">
+                                                        <i class="fas fa-message mr-1"></i>
+                                                        Send Message
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Regular Match -->
-                        <div class="card">
-                            <div class="flex items-start gap-4">
-                                <div class="relative">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-16 h-16 rounded-full">
-                                    <div class="absolute -top-1 -right-1 bg-gray-400 w-4 h-4 rounded-full border-2 border-white"></div>
+                        {% empty %}
+                            <div class="text-center py-12">
+                                <div class="text-gray-400 mb-4">
+                                    <i class="fas fa-search fa-3x"></i>
                                 </div>
-                                <div class="flex-1">
-                                    <div class="flex items-start justify-between">
-                                        <div>
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <h3 class="font-semibold text-gray-900">David Park</h3>
-                                                <span class="text-gray-500 text-sm">• Last seen 2 hours ago</span>
-                                            </div>
-                                            <div class="flex items-center gap-1 mb-2">
-                                                <div class="flex items-center">
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-gray-300 text-sm"></i>
-                                                </div>
-                                                <span class="text-sm text-gray-600 ml-1">4.6 (18 reviews)</span>
-                                            </div>
-                                            <p class="text-gray-700 text-sm mb-3">
-                                                Professional photographer and visual designer. Interested in learning
-                                                web development to create interactive portfolios.
-                                            </p>
-                                            <div class="flex flex-wrap gap-2 mb-3">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-green-700 font-medium">Teaches:</span>
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Photography</span>
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Design</span>
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Lightroom</span>
-                                                </div>
-                                            </div>
-                                            <div class="flex flex-wrap gap-2">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-purple-700 font-medium">Wants to
-                                                    learn:</span>
-                                                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">HTML/CSS</span>
-                                                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">JavaScript</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="text-2xl font-bold text-blue-600 mb-1">78%</div>
-                                            <div class="text-xs text-gray-500 mb-3">Match Score</div>
-                                            <div class="space-y-2">
-                                                <button onclick="requestSession('david-park')"
-                                                        class="btn btn-primary btn-sm w-full">
-                                                    <i class="fas fa-calendar-plus mr-1"></i>
-                                                    Request Session
-                                                </button>
-                                                <button onclick="sendMessage('david-park')"
-                                                        class="btn btn-outline btn-sm w-full">
-                                                    <i class="fas fa-message mr-1"></i>
-                                                    Send Message
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">No matches found</h3>
+                                <p class="text-gray-600 mb-4">Try adjusting your search criteria or filters</p>
+                                <a href="{% url 'matching' %}" class="btn btn-primary">Clear All Filters</a>
                             </div>
-                        </div>
-                        <!-- Another Match -->
-                        <div class="card">
-                            <div class="flex items-start gap-4">
-                                <div class="relative">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-16 h-16 rounded-full">
-                                    <div class="absolute -top-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-start justify-between">
-                                        <div>
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <h3 class="font-semibold text-gray-900">Maria Rodriguez</h3>
-                                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Online</span>
-                                            </div>
-                                            <div class="flex items-center gap-1 mb-2">
-                                                <div class="flex items-center">
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                </div>
-                                                <span class="text-sm text-gray-600 ml-1">4.8 (27 reviews)</span>
-                                            </div>
-                                            <p class="text-gray-700 text-sm mb-3">
-                                                Native Spanish speaker and language teacher. Also skilled in digital
-                                                marketing.
-                                                Looking to improve coding skills for career transition.
-                                            </p>
-                                            <div class="flex flex-wrap gap-2 mb-3">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-green-700 font-medium">Teaches:</span>
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Spanish</span>
-                                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Marketing</span>
-                                                </div>
-                                            </div>
-                                            <div class="flex flex-wrap gap-2">
-                                                <div class="flex items-center gap-1">
-                                                    <span class="text-xs text-purple-700 font-medium">Wants to
-                                                    learn:</span>
-                                                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">JavaScript</span>
-                                                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Python</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="text-2xl font-bold text-blue-600 mb-1">72%</div>
-                                            <div class="text-xs text-gray-500 mb-3">Match Score</div>
-                                            <div class="space-y-2">
-                                                <button onclick="requestSession('maria-rodriguez')"
-                                                        class="btn btn-primary btn-sm w-full">
-                                                    <i class="fas fa-calendar-plus mr-1"></i>
-                                                    Request Session
-                                                </button>
-                                                <button onclick="sendMessage('maria-rodriguez')"
-                                                        class="btn btn-outline btn-sm w-full">
-                                                    <i class="fas fa-message mr-1"></i>
-                                                    Send Message
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        {% endfor %}
+                        
+                        <!-- Load More (if pagination is needed) -->
+                        {% if matches|length >= 10 %}
+                            <div class="text-center py-8">
+                                <button class="btn btn-outline" onclick="loadMore()">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Load More Matches
+                                </button>
                             </div>
-                        </div>
-                        <!-- Load More -->
-                        <div class="text-center py-8">
-                            <button class="btn btn-outline">
-                                <i class="fas fa-plus mr-2"></i>
-                                Load More Matches
-                            </button>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </main>
+
     <!-- Request Session Modal -->
     <div id="requestSessionModal" class="modal" style="display: none;">
         <div class="modal-overlay">
@@ -368,71 +288,106 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="form-label">What would you like to learn?</label>
-                        <select class="form-input form-select">
-                            <option value="">Select a skill</option>
-                            <option value="react">React</option>
-                            <option value="javascript">JavaScript</option>
-                            <option value="css">CSS</option>
-                        </select>
+                <form method="POST" action="{% url 'request_session' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="partner_username" id="partnerUsername">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="form-label">What would you like to learn?</label>
+                            <select class="form-input form-select" name="skill_to_learn" required>
+                                <option value="">Select a skill</option>
+                                {% for skill in current_user_learning %}
+                                    <option value="{{ skill }}">{{ skill }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">What can you teach in return?</label>
+                            <select class="form-input form-select" name="skill_to_teach" required>
+                                <option value="">Select a skill</option>
+                                {% for skill in current_user_teaching %}
+                                    <option value="{{ skill }}">{{ skill }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Preferred session length</label>
+                            <select class="form-input form-select" name="session_length" required>
+                                <option value="30">30 minutes</option>
+                                <option value="60">1 hour</option>
+                                <option value="90">1.5 hours</option>
+                                <option value="120">2 hours</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Message (Optional)</label>
+                            <textarea class="form-input form-textarea" 
+                                      name="message"
+                                      placeholder="Introduce yourself and explain what you'd like to focus on..."></textarea>
+                        </div>
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" class="btn btn-primary">Send Request</button>
+                            <button type="button" 
+                                    onclick="closeModal(document.getElementById('requestSessionModal'))"
+                                    class="btn btn-secondary">Cancel</button>
+                        </div>
                     </div>
-                    <div>
-                        <label class="form-label">What can you teach in return?</label>
-                        <select class="form-input form-select">
-                            <option value="">Select a skill</option>
-                            <option value="python">Python</option>
-                            <option value="nodejs">Node.js</option>
-                            <option value="databases">Databases</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label">Preferred session length</label>
-                        <select class="form-input form-select">
-                            <option value="30">30 minutes</option>
-                            <option value="60">1 hour</option>
-                            <option value="90">1.5 hours</option>
-                            <option value="120">2 hours</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label">Message (Optional)</label>
-                        <textarea class="form-input form-textarea"
-                                  placeholder="Introduce yourself and explain what you'd like to focus on..."></textarea>
-                    </div>
-                    <div class="flex gap-3 pt-4">
-                        <button class="btn btn-primary">Send Request</button>
-                        <button onclick="closeModal(document.getElementById('requestSessionModal'))"
-                                class="btn btn-secondary">Cancel</button>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
-    <script src="./main.js"></script>
+
     <script>
         function toggleFilters() {
             const filters = document.getElementById('advancedFilters');
             filters.style.display = filters.style.display === 'none' ? 'block' : 'none';
         }
 
-        function requestSession(userId) {
-            document.getElementById('requestSessionModal').style.display = 'flex';
+        function requestSession(username) {
+            console.log('requestSession called with username:', username); // Debug log
+            
+            const modal = document.getElementById('requestSessionModal');
+            const partnerInput = document.getElementById('partnerUsername');
+            
+            if (!modal) {
+                console.error('Modal not found!');
+                alert('Modal not found. Please check the page.');
+                return;
+            }
+            
+            if (!partnerInput) {
+                console.error('Partner username input not found!');
+                alert('Form input not found. Please check the page.');
+                return;
+            }
+            
+            partnerInput.value = username;
+            modal.style.display = 'flex';
+            console.log('Modal should be visible now'); // Debug log
         }
 
-        function sendMessage(userId) {
-            alert(`Opening chat with ${userId}...`);
+        function sendMessage(username) {
+            // Redirect to messaging system or open chat
+            window.location.href = `/messages/chat/${username}/`;
         }
 
         function closeModal(modal) {
             modal.style.display = 'none';
         }
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function (e) {
-            // Implement search logic here
-            console.log('Searching for:', e.target.value);
+        function loadMore() {
+            // Implement pagination loading
+            console.log('Loading more matches...');
+        }
+
+        // Auto-submit form on filter changes for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterSelects = document.querySelectorAll('#skillFilter, #levelFilter');
+            filterSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    this.closest('form').submit();
+                });
+            });
         });
     </script>
 {% endblock content %}
