@@ -1,6 +1,5 @@
 {% extends "base/base.html" %}
 {% load static %}
-
 {% block content %}
     <!-- Main Content -->
     <main class="main-content">
@@ -31,16 +30,22 @@
                             <select class="form-input form-select" name="skill_filter" id="skillFilter">
                                 <option value="">All Skills</option>
                                 {% for skill in all_skills %}
-                                    <option value="{{ skill.name }}" {% if skill_filter == skill.name %}selected{% endif %}>
+                                    <option value="{{ skill.name }}"
+                                            {% if skill_filter == skill.name %}selected{% endif %}>
                                         {{ skill.name }}
                                     </option>
                                 {% endfor %}
                             </select>
                             <select class="form-input form-select" name="level_filter" id="levelFilter">
                                 <option value="">All Levels</option>
-                                <option value="beginner" {% if level_filter == 'beginner' %}selected{% endif %}>Beginner</option>
-                                <option value="intermediate" {% if level_filter == 'intermediate' %}selected{% endif %}>Intermediate</option>
-                                <option value="advanced" {% if level_filter == 'advanced' %}selected{% endif %}>Advanced</option>
+                                <option value="beginner"
+                                        {% if level_filter == 'beginner' %}selected{% endif %}>Beginner</option>
+                                <option value="intermediate"
+                                        {% if level_filter == 'intermediate' %}selected{% endif %}>
+                                    Intermediate
+                                </option>
+                                <option value="advanced"
+                                        {% if level_filter == 'advanced' %}selected{% endif %}>Advanced</option>
                                 <option value="expert" {% if level_filter == 'expert' %}selected{% endif %}>Expert</option>
                             </select>
                             <button type="button" class="btn btn-outline" onclick="toggleFilters()">
@@ -49,9 +54,10 @@
                             </button>
                         </div>
                     </div>
-                    
                     <!-- Advanced Filters (Hidden by default) -->
-                    <div id="advancedFilters" class="mt-4 pt-4 border-t border-gray-200" style="display: none">
+                    <div id="advancedFilters"
+                         class="mt-4 pt-4 border-t border-gray-200"
+                         style="display: none">
                         <div class="grid grid-3 gap-4">
                             <div>
                                 <label class="form-label">Availability</label>
@@ -89,7 +95,6 @@
                     </div>
                 </form>
             </div>
-            
             <!-- Match Results -->
             <div class="flex gap-6">
                 <!-- Sidebar with Quick Stats -->
@@ -111,7 +116,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="card">
                         <h3 class="font-semibold text-gray-900 mb-3">Popular Skills</h3>
                         <div class="space-y-2">
@@ -124,7 +128,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <!-- Main Results -->
                 <div class="flex-1">
                     <!-- Sort Options -->
@@ -135,11 +138,12 @@
                         <form method="GET" class="inline">
                             <!-- Preserve existing filters -->
                             {% for key, value in request.GET.items %}
-                                {% if key != 'sort' %}
-                                    <input type="hidden" name="{{ key }}" value="{{ value }}">
-                                {% endif %}
+                                {% if key != 'sort' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
                             {% endfor %}
-                            <select class="form-input form-select" style="width: auto;" name="sort" onchange="this.form.submit()">
+                            <select class="form-input form-select"
+                                    style="width: auto"
+                                    name="sort"
+                                    onchange="this.form.submit()">
                                 <option value="relevance" {% if sort_by == 'relevance' %}selected{% endif %}>Best Match</option>
                                 <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Highest Rated</option>
                                 <option value="sessions" {% if sort_by == 'sessions' %}selected{% endif %}>Most Sessions</option>
@@ -147,7 +151,6 @@
                             </select>
                         </form>
                     </div>
-                    
                     <!-- Match Cards -->
                     <div class="space-y-4">
                         {% for match in matches %}
@@ -155,33 +158,39 @@
                                 <div class="flex items-start gap-4">
                                     <div class="relative" style="width: 64px; height: 64px; flex-shrink: 0;">
                                         <img src="{% if match.user.profile.image %}{{ match.user.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
-                                            alt="{{ match.user.profile.full_name|default:match.user.username }}"
-                                            style="width: 64px; height: 64px; border-radius: 50%; object-fit: cover; display: block;">
-                                        <div style="position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; background-color: {% if match.is_online %}#10b981{% else %}#9ca3af{% endif %};"></div>
+                                             alt="{{ match.user.profile.full_name|default:match.user.username }}"
+                                             style="width: 64px;
+                                                    height: 64px;
+                                                    border-radius: 50%;
+                                                    object-fit: cover;
+                                                    display: block">
+                                        <div style="position: absolute;
+                                                    top: -2px;
+                                                    right: -2px;
+                                                    width: 16px;
+                                                    height: 16px;
+                                                    border-radius: 50%;
+                                                    border: 2px solid white;
+                                                    background-color: {% if match.is_online %}#10b981{% else %}#9ca3af{% endif %}">
+                                        </div>
                                     </div>
-                                    
                                     <div class="flex-1">
                                         <div class="flex items-start justify-between">
                                             <div>
                                                 <div class="flex items-center gap-2 mb-1">
-                                                    <h3 class="font-semibold text-gray-900">
-                                                        {{ match.user.profile.full_name|default:match.user.username }}
-                                                    </h3>
-                                                    
+                                                    <h3 class="font-semibold text-gray-900">{{ match.user.profile.full_name|default:match.user.username }}</h3>
                                                     {% if match.perfect_match %}
                                                         <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
                                                             <i class="fas fa-star mr-1"></i>
                                                             Perfect Match
                                                         </span>
                                                     {% endif %}
-                                                    
                                                     {% if match.is_online %}
                                                         <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">Online</span>
                                                     {% else %}
                                                         <span class="text-gray-500 text-sm">• Last seen {{ match.user.last_login|timesince }} ago</span>
                                                     {% endif %}
                                                 </div>
-                                                
                                                 <div class="flex items-center gap-1 mb-2">
                                                     <div class="flex items-center">
                                                         {% with rating=match.user.profile.rating %}
@@ -198,49 +207,36 @@
                                                         {{ match.user.profile.rating|floatformat:1 }} ({{ match.user.profile.sessions }} reviews)
                                                     </span>
                                                 </div>
-                                                
-                                                <p class="text-gray-700 text-sm mb-3">
-                                                    {{ match.user.profile.bio|default:"No bio available yet." }}
-                                                </p>
-                                                
+                                                <p class="text-gray-700 text-sm mb-3">{{ match.user.profile.bio|default:"No bio available yet." }}</p>
                                                 {% if match.teaching_skills %}
                                                     <div class="flex flex-wrap gap-2 mb-3">
                                                         <div class="flex items-center gap-1">
                                                             <span class="text-xs text-green-700 font-medium">Teaches:</span>
                                                             {% for skill in match.teaching_skills %}
-                                                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
-                                                                    {{ skill.skill.name }}
-                                                                </span>
+                                                                <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">{{ skill.skill.name }}</span>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
                                                 {% endif %}
-                                                
                                                 {% if match.learning_skills %}
                                                     <div class="flex flex-wrap gap-2">
                                                         <div class="flex items-center gap-1">
                                                             <span class="text-xs text-purple-700 font-medium">Wants to learn:</span>
                                                             {% for skill in match.learning_skills %}
-                                                                <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
-                                                                    {{ skill.skill.name }}
-                                                                </span>
+                                                                <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">{{ skill.skill.name }}</span>
                                                             {% endfor %}
                                                         </div>
                                                     </div>
                                                 {% endif %}
                                             </div>
-                                            
                                             <div class="text-right">
                                                 <div class="text-2xl font-bold {% if match.perfect_match %}text-green-600{% else %}text-blue-600{% endif %} mb-1">
                                                     {{ match.score }}%
                                                 </div>
                                                 <div class="text-xs text-gray-500 mb-3">Match Score</div>
                                                 <div class="space-y-2">
-                                                    <button onclick="requestSession('{{ match.user.username }}')"
-                                                            class="btn btn-primary btn-sm w-full">
-                                                        <i class="fas fa-calendar-plus mr-1"></i>
-                                                        Request Session
-                                                    </button>
+                                                    
+                                                    <button type="button" onclick="requestSession('{{ match.user.username }}')" class="btn btn-primary btn-sm w-full">Send Request</button>
                                                     <button onclick="sendMessage('{{ match.user.username }}')"
                                                             class="btn btn-outline btn-sm w-full">
                                                         <i class="fas fa-message mr-1"></i>
@@ -262,7 +258,6 @@
                                 <a href="{% url 'matching' %}" class="btn btn-primary">Clear All Filters</a>
                             </div>
                         {% endfor %}
-                        
                         <!-- Load More (if pagination is needed) -->
                         {% if matches|length >= 10 %}
                             <div class="text-center py-8">
@@ -277,66 +272,55 @@
             </div>
         </div>
     </main>
-
     <!-- Request Session Modal -->
-    <div id="requestSessionModal" class="modal" style="display: none;">
-        <div class="modal-overlay">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Request Learning Session</h3>
-                    <button onclick="closeModal(document.getElementById('requestSessionModal'))">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <form method="POST" action="{% url 'request_session' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="partner_username" id="partnerUsername">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="form-label">What would you like to learn?</label>
-                            <select class="form-input form-select" name="skill_to_learn" required>
-                                <option value="">Select a skill</option>
-                                {% for skill in current_user_learning %}
-                                    <option value="{{ skill }}">{{ skill }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="form-label">What can you teach in return?</label>
-                            <select class="form-input form-select" name="skill_to_teach" required>
-                                <option value="">Select a skill</option>
-                                {% for skill in current_user_teaching %}
-                                    <option value="{{ skill }}">{{ skill }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div>
-                            <label class="form-label">Preferred session length</label>
-                            <select class="form-input form-select" name="session_length" required>
-                                <option value="30">30 minutes</option>
-                                <option value="60">1 hour</option>
-                                <option value="90">1.5 hours</option>
-                                <option value="120">2 hours</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="form-label">Message (Optional)</label>
-                            <textarea class="form-input form-textarea" 
-                                      name="message"
-                                      placeholder="Introduce yourself and explain what you'd like to focus on..."></textarea>
-                        </div>
-                        <div class="flex gap-3 pt-4">
-                            <button type="submit" class="btn btn-primary">Send Request</button>
-                            <button type="button" 
-                                    onclick="closeModal(document.getElementById('requestSessionModal'))"
-                                    class="btn btn-secondary">Cancel</button>
-                        </div>
-                    </div>
-                </form>
+    <div id="requestSessionModal" class="modal">
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Request Learning Session</h3>
+                <button type="button" onclick="closeModal(document.getElementById('requestSessionModal'))">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            
+            <form method="POST" action="{% url 'request_session' %}">
+                {% csrf_token %}
+                <input type="hidden" name="partner_username" id="partnerUsername">
+                
+                <div>
+                    <label>What would you like to learn?</label>
+                    <select name="skill_to_learn" required>
+                        <option value="">Select a skill</option>
+                        {% for skill in current_user_learning %}
+                            <option value="{{ skill }}">{{ skill }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label>What can you teach in return?</label>
+                    <select name="skill_to_teach" required>
+                        <option value="">Select a skill</option>
+                        {% for skill in current_user_teaching %}
+                            <option value="{{ skill }}">{{ skill }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label>Session length</label>
+                    <select name="session_length" required>
+                        <option value="30">30 minutes</option>
+                        <option value="60">1 hour</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Send Request</button>
+                <button type="button" onclick="closeModal(document.getElementById('requestSessionModal'))">Cancel</button>
+            </form>
         </div>
     </div>
-
+</div>
     <script>
         function toggleFilters() {
             const filters = document.getElementById('advancedFilters');
@@ -344,50 +328,79 @@
         }
 
         function requestSession(username) {
-            console.log('requestSession called with username:', username); // Debug log
+            console.log('=== requestSession called ===');
+            console.log('Username:', username);
             
             const modal = document.getElementById('requestSessionModal');
+            console.log('Modal found:', !!modal);
+            
+            if (modal) {
+                modal.classList.add('show');
+                console.log('Modal show class added');
+            }
+            
             const partnerInput = document.getElementById('partnerUsername');
-            
-            if (!modal) {
-                console.error('Modal not found!');
-                alert('Modal not found. Please check the page.');
-                return;
+            if (partnerInput) {
+                partnerInput.value = username;
+                console.log('Partner username set to:', partnerInput.value);
             }
-            
-            if (!partnerInput) {
-                console.error('Partner username input not found!');
-                alert('Form input not found. Please check the page.');
-                return;
-            }
-            
-            partnerInput.value = username;
-            modal.style.display = 'flex';
-            console.log('Modal should be visible now'); // Debug log
-        }
-
-        function sendMessage(username) {
-            // Redirect to messaging system or open chat
-            window.location.href = `/messages/chat/${username}/`;
         }
 
         function closeModal(modal) {
-            modal.style.display = 'none';
+                modal.classList.remove('show'); // Use classList instead of style.display
+            }
+        
+        function sendMessage(username) {
+                        // Redirect to messaging system or open chat
+                        window.location.href = `/messages/chat/${username}/`;
         }
 
-        function loadMore() {
-            // Implement pagination loading
-            console.log('Loading more matches...');
+        function closeModal(modal) {
+            modal.classList.remove('show');
         }
+                    function loadMore() {
+                        // Implement pagination loading
+                        console.log('Loading more matches...');
+                    }
 
-        // Auto-submit form on filter changes for better UX
-        document.addEventListener('DOMContentLoaded', function() {
-            const filterSelects = document.querySelectorAll('#skillFilter, #levelFilter');
-            filterSelects.forEach(select => {
-                select.addEventListener('change', function() {
-                    this.closest('form').submit();
-                });
-            });
+                    // Auto-submit form on filter changes for better UX
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const filterSelects = document.querySelectorAll('#skillFilter, #levelFilter');
+                        filterSelects.forEach(select => {
+                            select.addEventListener('change', function() {
+                                this.closest('form').submit();
+                            });
+                        });
         });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== DOM LOADED ===');
+    
+    // Your existing filter code
+    const filterSelects = document.querySelectorAll('#skillFilter, #levelFilter');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+    });
+
+    // ADD THIS DEBUGGING CODE:
+    const modal = document.getElementById('requestSessionModal');
+    console.log('Modal exists:', !!modal);
+    
+    const form = document.querySelector('#requestSessionModal form');
+    console.log('Form exists:', !!form);
+    
+    if (form) {
+        console.log('Form action:', form.action);
+        console.log('Form method:', form.method);
+        
+        form.addEventListener('submit', function(e) {
+            console.log('=== FORM SUBMIT EVENT TRIGGERED ===');
+            console.log('Form valid:', this.checkValidity());
+            // Let it submit normally
+        });
+    }
+});
     </script>
 {% endblock content %}

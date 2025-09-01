@@ -1,4 +1,5 @@
 {% extends "base/base.html" %}
+{% load static %}
 {% block content %}
     <!-- Main Content -->
     <main class="main-content">
@@ -10,7 +11,7 @@
                         <h1 class="page-title">My Sessions</h1>
                         <p class="page-description">Manage your learning sessions, requests, and bookings</p>
                     </div>
-                    <a href="matching.html" class="btn btn-primary">
+                    <a href="{% url 'matching' %}" class="btn btn-primary">
                         <i class="fas fa-plus mr-2"></i>
                         Find New Session
                     </a>
@@ -26,12 +27,12 @@
                             id="upcomingTab">
                         <i class="fas fa-calendar-alt mr-2"></i>
                         Upcoming Sessions
-                        <span class="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">3</span>
+                        <span class="ml-2 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">{{ upcoming_sessions.count }}</span>
                     </button>
                     <button onclick="showTab('requests')" class="tab-button" id="requestsTab">
                         <i class="fas fa-inbox mr-2"></i>
                         Requests
-                        <span class="ml-2 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">5</span>
+                        <span class="ml-2 bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">{{ received_requests.count }}</span>
                     </button>
                     <button onclick="showTab('history')" class="tab-button" id="historyTab">
                         <i class="fas fa-history mr-2"></i>
@@ -40,122 +41,192 @@
                     <button onclick="showTab('feedback')" class="tab-button" id="feedbackTab">
                         <i class="fas fa-star mr-2"></i>
                         Pending Feedback
-                        <span class="ml-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">2</span>
+                        <span class="ml-2 bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">{{ pending_feedback.count }}</span>
                     </button>
                 </div>
             </div>
             <!-- Upcoming Sessions Tab -->
             <div id="upcomingContent" class="tab-content">
                 <div class="space-y-4">
-                    <!-- Today's Sessions -->
-                    <div class="card border-blue-200 bg-blue-50">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-semibold text-blue-900">Today's Sessions</h3>
-                            <span class="text-blue-600 text-sm">January 15, 2024</span>
-                        </div>
-                        <div class="bg-white rounded-lg p-4 border border-blue-200">
-                            <div class="flex items-start gap-4">
-                                <img src="../assets/default-avatar.png"
-                                     alt="User"
-                                     class="w-12 h-12 rounded-full">
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">JavaScript Fundamentals</h4>
-                                            <p class="text-gray-600 text-sm">Learning session with Sarah Chen</p>
-                                            <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                                                <span><i class="fas fa-clock mr-1"></i>2:00 PM - 3:00 PM</span>
-                                                <span><i class="fas fa-video mr-1"></i>Online</span>
-                                                <span><i class="fas fa-tag mr-1"></i>Beginner Level</span>
+                    {% if today_sessions %}
+                        <!-- Today's Sessions -->
+                        <div class="card border-blue-200 bg-blue-50">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold text-blue-900">Today's Sessions</h3>
+                                <span class="text-blue-600 text-sm">{{ today|date:"F d, Y" }}</span>
+                            </div>
+                            {% for session in today_sessions %}
+                                <div class="bg-white rounded-lg p-4 border border-blue-200 mb-3">
+                                    <div class="flex items-start gap-4">
+                                        {% if session.teacher == request.user %}
+                                            <img src="{% if session.student.profile.image %}{{ session.student.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                 alt="{{ session.student.profile.full_name|default:session.student.username }}"
+                                                 class="w-12 h-12 rounded-full">
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <h4 class="font-semibold text-gray-900">{{ session.skill.name }}</h4>
+                                                        <p class="text-gray-600 text-sm">
+                                                            Teaching session with {{ session.student.profile.full_name|default:session.student.username }}
+                                                        </p>
+                                                        <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                            <span><i class="fas fa-clock mr-1"></i>{{ session.scheduled_time|time:"g:i A" }} - {{ session.scheduled_time|date:"g:i A" }}</span>
+                                                            <span><i class="fas fa-video mr-1"></i>Online</span>
+                                                            <span><i class="fas fa-tag mr-1"></i>{{ session.duration }} minutes</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex gap-2">
+                                                        <button class="btn btn-success btn-sm"
+                                                                onclick="joinSession({{ session.id }})">
+                                                            <i class="fas fa-video mr-1"></i>
+                                                            Join Meeting
+                                                        </button>
+                                                        <button onclick="rescheduleSession({{ session.id }})"
+                                                                class="btn btn-outline btn-sm">
+                                                            <i class="fas fa-calendar mr-1"></i>
+                                                            Reschedule
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {% if session.notes %}
+                                                    <div class="mt-3 p-3 bg-gray-50 rounded">
+                                                        <p class="text-sm text-gray-700">
+                                                            <strong>Session Plan:</strong> {{ session.notes }}
+                                                        </p>
+                                                    </div>
+                                                {% endif %}
                                             </div>
-                                        </div>
-                                        <div class="flex gap-2">
-                                            <button class="btn btn-success btn-sm">
-                                                <i class="fas fa-video mr-1"></i>
-                                                Join Meeting
-                                            </button>
-                                            <button onclick="rescheduleSession(1)" class="btn btn-outline btn-sm">
-                                                <i class="fas fa-calendar mr-1"></i>
-                                                Reschedule
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="mt-3 p-3 bg-gray-50 rounded">
-                                        <p class="text-sm text-gray-700">
-                                            <strong>Session Plan:</strong> We'll cover variables, functions, and basic DOM manipulation.
-                                            Please have VS Code ready and a simple HTML file to practice with.
-                                        </p>
+                                        {% else %}
+                                            <img src="{% if session.teacher.profile.image %}{{ session.teacher.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                 alt="{{ session.teacher.profile.full_name|default:session.teacher.username }}"
+                                                 class="w-12 h-12 rounded-full">
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <h4 class="font-semibold text-gray-900">{{ session.skill.name }}</h4>
+                                                        <p class="text-gray-600 text-sm">
+                                                            Learning session with {{ session.teacher.profile.full_name|default:session.teacher.username }}
+                                                        </p>
+                                                        <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                            <span><i class="fas fa-clock mr-1"></i>{{ session.scheduled_time|time:"g:i A" }} - {{ session.scheduled_time|date:"g:i A" }}</span>
+                                                            <span><i class="fas fa-video mr-1"></i>Online</span>
+                                                            <span><i class="fas fa-tag mr-1"></i>{{ session.duration }} minutes</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex gap-2">
+                                                        <button class="btn btn-success btn-sm"
+                                                                onclick="joinSession({{ session.id }})">
+                                                            <i class="fas fa-video mr-1"></i>
+                                                            Join Meeting
+                                                        </button>
+                                                        <button onclick="rescheduleSession({{ session.id }})"
+                                                                class="btn btn-outline btn-sm">
+                                                            <i class="fas fa-calendar mr-1"></i>
+                                                            Reschedule
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {% if session.notes %}
+                                                    <div class="mt-3 p-3 bg-gray-50 rounded">
+                                                        <p class="text-sm text-gray-700">
+                                                            <strong>Session Plan:</strong> {{ session.notes }}
+                                                        </p>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
-                            </div>
+                            {% endfor %}
                         </div>
-                    </div>
+                    {% endif %}
                     <!-- Upcoming Sessions -->
-                    <div class="card">
-                        <h3 class="font-semibold text-gray-900 mb-4">This Week</h3>
-                        <div class="space-y-4">
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-start gap-4">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-12 h-12 rounded-full">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <h4 class="font-semibold text-gray-900">Spanish Conversation Practice</h4>
-                                                <p class="text-gray-600 text-sm">Learning session with Maria Rodriguez</p>
-                                                <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                                                    <span><i class="fas fa-calendar mr-1"></i>Tomorrow, Jan 16</span>
-                                                    <span><i class="fas fa-clock mr-1"></i>10:00 AM - 11:00 AM</span>
-                                                    <span><i class="fas fa-language mr-1"></i>Intermediate</span>
+                    {% if week_sessions %}
+                        <div class="card">
+                            <h3 class="font-semibold text-gray-900 mb-4">This Week</h3>
+                            <div class="space-y-4">
+                                {% for session in week_sessions %}
+                                    <div class="border border-gray-200 rounded-lg p-4">
+                                        <div class="flex items-start gap-4">
+                                            {% if session.teacher == request.user %}
+                                                <img src="{% if session.student.profile.image %}{{ session.student.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                     alt="{{ session.student.profile.full_name|default:session.student.username }}"
+                                                     class="w-12 h-12 rounded-full">
+                                                <div class="flex-1">
+                                                    <div class="flex items-center justify-between">
+                                                        <div>
+                                                            <h4 class="font-semibold text-gray-900">{{ session.skill.name }}</h4>
+                                                            <p class="text-gray-600 text-sm">
+                                                                Teaching session with {{ session.student.profile.full_name|default:session.student.username }}
+                                                            </p>
+                                                            <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                                <span><i class="fas fa-calendar mr-1"></i>{{ session.scheduled_time|date:"M d" }}</span>
+                                                                <span><i class="fas fa-clock mr-1"></i>{{ session.scheduled_time|time:"g:i A" }}</span>
+                                                                <span><i class="fas fa-chalkboard-teacher mr-1"></i>Teaching</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex gap-2">
+                                                            <button onclick="sendMessage('{{ session.student.username }}')"
+                                                                    class="btn btn-outline btn-sm">
+                                                                <i class="fas fa-message mr-1"></i>
+                                                                Message
+                                                            </button>
+                                                            <button onclick="prepareSession({{ session.id }})"
+                                                                    class="btn btn-primary btn-sm">
+                                                                <i class="fas fa-edit mr-1"></i>
+                                                                Prepare
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="flex gap-2">
-                                                <button onclick="sendMessage('maria')" class="btn btn-outline btn-sm">
-                                                    <i class="fas fa-message mr-1"></i>
-                                                    Message
-                                                </button>
-                                                <button onclick="rescheduleSession(2)" class="btn btn-outline btn-sm">
-                                                    <i class="fas fa-calendar mr-1"></i>
-                                                    Reschedule
-                                                </button>
-                                            </div>
+                                            {% else %}
+                                                <img src="{% if session.teacher.profile.image %}{{ session.teacher.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                     alt="{{ session.teacher.profile.full_name|default:session.teacher.username }}"
+                                                     class="w-12 h-12 rounded-full">
+                                                <div class="flex-1">
+                                                    <div class="flex items-center justify-between">
+                                                        <div>
+                                                            <h4 class="font-semibold text-gray-900">{{ session.skill.name }}</h4>
+                                                            <p class="text-gray-600 text-sm">
+                                                                Learning session with {{ session.teacher.profile.full_name|default:session.teacher.username }}
+                                                            </p>
+                                                            <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                                <span><i class="fas fa-calendar mr-1"></i>{{ session.scheduled_time|date:"M d" }}</span>
+                                                                <span><i class="fas fa-clock mr-1"></i>{{ session.scheduled_time|time:"g:i A" }}</span>
+                                                                <span><i class="fas fa-graduation-cap mr-1"></i>Learning</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex gap-2">
+                                                            <button onclick="sendMessage('{{ session.teacher.username }}')"
+                                                                    class="btn btn-outline btn-sm">
+                                                                <i class="fas fa-message mr-1"></i>
+                                                                Message
+                                                            </button>
+                                                            <button onclick="rescheduleSession({{ session.id }})"
+                                                                    class="btn btn-outline btn-sm">
+                                                                <i class="fas fa-calendar mr-1"></i>
+                                                                Reschedule
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-start gap-4">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-12 h-12 rounded-full">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <h4 class="font-semibold text-gray-900">React Components Deep Dive</h4>
-                                                <p class="text-gray-600 text-sm">Teaching session for Alex Kim</p>
-                                                <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                                                    <span><i class="fas fa-calendar mr-1"></i>Friday, Jan 18</span>
-                                                    <span><i class="fas fa-clock mr-1"></i>3:00 PM - 4:30 PM</span>
-                                                    <span><i class="fas fa-chalkboard-teacher mr-1"></i>Teaching</span>
-                                                </div>
-                                            </div>
-                                            <div class="flex gap-2">
-                                                <button onclick="sendMessage('alex')" class="btn btn-outline btn-sm">
-                                                    <i class="fas fa-message mr-1"></i>
-                                                    Message
-                                                </button>
-                                                <button onclick="prepareSession(3)" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-edit mr-1"></i>
-                                                    Prepare
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {% endfor %}
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
+                    {% if not today_sessions and not week_sessions %}
+                        <div class="text-center py-12">
+                            <div class="text-gray-400 mb-4">
+                                <i class="fas fa-calendar-times fa-3x"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">No upcoming sessions</h3>
+                            <p class="text-gray-600 mb-4">Ready to start learning? Find a session partner!</p>
+                            <a href="{% url 'matching' %}" class="btn btn-primary">Find Learning Partners</a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             <!-- Requests Tab -->
@@ -168,74 +239,71 @@
                             <span class="text-sm text-gray-600">People who want to learn from you</span>
                         </div>
                         <div class="space-y-4">
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-start gap-3">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-10 h-10 rounded-full">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <h4 class="font-medium">Emma Wilson</h4>
-                                            <span class="text-xs text-gray-500">2 hours ago</span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 mb-2">
-                                            Wants to learn <strong>CSS Grid Layout</strong>
-                                        </p>
-                                        <p class="text-xs text-gray-600 mb-3">
-                                            "Hi! I'm a beginner developer and would love to learn CSS Grid from you.
-                                            I can teach you basic photography in return."
-                                        </p>
-                                        <div class="flex gap-2">
-                                            <button onclick="acceptRequest(1)" class="btn btn-success btn-sm">
-                                                <i class="fas fa-check mr-1"></i>
-                                                Accept
-                                            </button>
-                                            <button onclick="declineRequest(1)" class="btn btn-danger btn-sm">
-                                                <i class="fas fa-times mr-1"></i>
-                                                Decline
-                                            </button>
-                                            <button onclick="sendMessage('emma')" class="btn btn-outline btn-sm">
-                                                <i class="fas fa-message mr-1"></i>
-                                                Message
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="border border-gray-200 rounded-lg p-4">
-                                <div class="flex items-start gap-3">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-10 h-10 rounded-full">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <h4 class="font-medium">Mike Chen</h4>
-                                            <span class="text-xs text-gray-500">1 day ago</span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 mb-2">
-                                            Wants to learn <strong>JavaScript ES6</strong>
-                                        </p>
-                                        <p class="text-xs text-gray-600 mb-3">
-                                            "I'm looking to level up my JavaScript skills, especially ES6 features.
-                                            I can help you with Python or data analysis."
-                                        </p>
-                                        <div class="flex gap-2">
-                                            <button onclick="acceptRequest(2)" class="btn btn-success btn-sm">
-                                                <i class="fas fa-check mr-1"></i>
-                                                Accept
-                                            </button>
-                                            <button onclick="declineRequest(2)" class="btn btn-danger btn-sm">
-                                                <i class="fas fa-times mr-1"></i>
-                                                Decline
-                                            </button>
-                                            <button onclick="sendMessage('mike')" class="btn btn-outline btn-sm">
-                                                <i class="fas fa-message mr-1"></i>
-                                                Message
-                                            </button>
+                            {% for request in received_requests %}
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-start gap-3">
+                                        <img src="{% if request.requester.profile.image %}{{ request.requester.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                             alt="{{ request.requester.profile.full_name|default:request.requester.username }}"
+                                             class="w-10 h-10 rounded-full">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <h4 class="font-medium">{{ request.requester.profile.full_name|default:request.requester.username }}</h4>
+                                                <span class="text-xs text-gray-500">{{ request.created_at|timesince }} ago</span>
+                                            </div>
+                                            <p class="text-sm text-gray-700 mb-2">
+                                                Wants to learn <strong>{{ request.skill_to_learn }}</strong>
+                                            </p>
+                                            <p class="text-xs text-gray-600 mb-2">
+                                                Offering <strong>{{ request.skill_to_teach }}</strong> in return
+                                            </p>
+                                            <p class="text-xs text-gray-600 mb-2">
+                                                Session length: <strong>{{ request.session_length }} minutes</strong>
+                                            </p>
+                                            {% if request.message %}<p class="text-xs text-gray-600 mb-3">"{{ request.message|truncatechars:100 }}"</p>{% endif %}
+                                            {% if request.status == 'pending' %}
+                                                <div class="flex gap-2">
+                                                    <form method="post"
+                                                          action="{% url 'handle_session_request' request.id %}"
+                                                          class="inline">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="accept">
+                                                        <button type="submit" class="btn btn-success btn-sm">
+                                                            <i class="fas fa-check mr-1"></i>
+                                                            Accept
+                                                        </button>
+                                                    </form>
+                                                    <form method="post"
+                                                          action="{% url 'handle_session_request' request.id %}"
+                                                          class="inline">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="action" value="decline">
+                                                        <button type="submit" class="btn btn-danger btn-sm">
+                                                            <i class="fas fa-times mr-1"></i>
+                                                            Decline
+                                                        </button>
+                                                    </form>
+                                                    <button onclick="sendMessage('{{ request.requester.username }}')"
+                                                            class="btn btn-outline btn-sm">
+                                                        <i class="fas fa-message mr-1"></i>
+                                                        Message
+                                                    </button>
+                                                </div>
+                                            {% else %}
+                                                <span class="inline-block px-2 py-1 text-xs rounded-full {% if request.status == 'accepted' %}bg-green-100 text-green-800 {% elif request.status == 'declined' %}bg-red-100 text-red-800 {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                                    {{ request.get_status_display }}
+                                                </span>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            {% empty %}
+                                <div class="text-center py-8">
+                                    <div class="text-gray-400 mb-2">
+                                        <i class="fas fa-inbox fa-2x"></i>
+                                    </div>
+                                    <p class="text-gray-600">No incoming requests</p>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                     <!-- Outgoing Requests -->
@@ -245,83 +313,68 @@
                             <span class="text-sm text-gray-600">Your requests to learn from others</span>
                         </div>
                         <div class="space-y-4">
-                            <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
-                                <div class="flex items-start gap-3">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-10 h-10 rounded-full">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <h4 class="font-medium">Lisa Park</h4>
-                                            <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">Pending</span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 mb-2">
-                                            You want to learn <strong>Python Django</strong>
-                                        </p>
-                                        <p class="text-xs text-gray-600 mb-3">Sent 3 hours ago • Offering JavaScript in return</p>
-                                        <div class="flex gap-2">
-                                            <button onclick="cancelRequest(1)" class="btn btn-outline btn-sm">
-                                                <i class="fas fa-times mr-1"></i>
-                                                Cancel Request
-                                            </button>
-                                            <button onclick="sendMessage('lisa')" class="btn btn-outline btn-sm">
-                                                <i class="fas fa-message mr-1"></i>
-                                                Message
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="border border-green-200 bg-green-50 rounded-lg p-4">
-                                <div class="flex items-start gap-3">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-10 h-10 rounded-full">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <h4 class="font-medium">Tom Wilson</h4>
-                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Accepted</span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 mb-2">
-                                            You want to learn <strong>Photography Composition</strong>
-                                        </p>
-                                        <p class="text-xs text-gray-600 mb-3">Accepted yesterday • Session scheduled for next week</p>
-                                        <div class="flex gap-2">
-                                            <button onclick="viewSession(4)" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-calendar mr-1"></i>
-                                                View Session
-                                            </button>
-                                            <button onclick="sendMessage('tom')" class="btn btn-outline btn-sm">
-                                                <i class="fas fa-message mr-1"></i>
-                                                Message
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="border border-red-200 bg-red-50 rounded-lg p-4">
-                                <div class="flex items-start gap-3">
-                                    <img src="../assets/default-avatar.png"
-                                         alt="User"
-                                         class="w-10 h-10 rounded-full">
-                                    <div class="flex-1">
-                                        <div class="flex items-center justify-between mb-2">
-                                            <h4 class="font-medium">Anna Kim</h4>
-                                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Declined</span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 mb-2">
-                                            You wanted to learn <strong>UI/UX Design</strong>
-                                        </p>
-                                        <p class="text-xs text-gray-600 mb-3">Declined 2 days ago • Schedule conflicts mentioned</p>
-                                        <div class="flex gap-2">
-                                            <button onclick="findAlternative('ui-ux')" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-search mr-1"></i>
-                                                Find Alternative
-                                            </button>
+                            {% for request in sent_requests %}
+                                <div class="border {% if request.status == 'pending' %}border-yellow-200 bg-yellow-50 {% elif request.status == 'accepted' %}border-green-200 bg-green-50 {% elif request.status == 'declined' %}border-red-200 bg-red-50 {% else %}border-gray-200{% endif %} rounded-lg p-4">
+                                    <div class="flex items-start gap-3">
+                                        <img src="{% if request.partner.profile.image %}{{ request.partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                             alt="{{ request.partner.profile.full_name|default:request.partner.username }}"
+                                             class="w-10 h-10 rounded-full">
+                                        <div class="flex-1">
+                                            <div class="flex items-center justify-between mb-2">
+                                                <h4 class="font-medium">{{ request.partner.profile.full_name|default:request.partner.username }}</h4>
+                                                <span class="px-2 py-1 rounded text-xs {% if request.status == 'pending' %}bg-yellow-100 text-yellow-800 {% elif request.status == 'accepted' %}bg-green-100 text-green-800 {% elif request.status == 'declined' %}bg-red-100 text-red-800 {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                                    {{ request.get_status_display }}
+                                                </span>
+                                            </div>
+                                            <p class="text-sm text-gray-700 mb-2">
+                                                You want to learn <strong>{{ request.skill_to_learn }}</strong>
+                                            </p>
+                                            <p class="text-xs text-gray-600 mb-3">
+                                                Sent {{ request.created_at|timesince }} ago • Offering {{ request.skill_to_teach }} in return
+                                            </p>
+                                            <div class="flex gap-2">
+                                                {% if request.status == 'pending' %}
+                                                    <form method="post"
+                                                          action="{% url 'cancel_session_request' request.id %}"
+                                                          class="inline">
+                                                        {% csrf_token %}
+                                                        <button type="submit"
+                                                                class="btn btn-outline btn-sm"
+                                                                onclick="return confirm('Are you sure you want to cancel this request?')">
+                                                            <i class="fas fa-times mr-1"></i>
+                                                            Cancel Request
+                                                        </button>
+                                                    </form>
+                                                {% elif request.status == 'accepted' %}
+                                                    <button onclick="viewSession({{ request.id }})"
+                                                            class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-calendar mr-1"></i>
+                                                        View Session
+                                                    </button>
+                                                {% elif request.status == 'declined' %}
+                                                    <button onclick="findAlternative('{{ request.skill_to_learn }}')"
+                                                            class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-search mr-1"></i>
+                                                        Find Alternative
+                                                    </button>
+                                                {% endif %}
+                                                <button onclick="sendMessage('{{ request.partner.username }}')"
+                                                        class="btn btn-outline btn-sm">
+                                                    <i class="fas fa-message mr-1"></i>
+                                                    Message
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            {% empty %}
+                                <div class="text-center py-8">
+                                    <div class="text-gray-400 mb-2">
+                                        <i class="fas fa-paper-plane fa-2x"></i>
+                                    </div>
+                                    <p class="text-gray-600">No outgoing requests</p>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -332,100 +385,161 @@
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="font-semibold text-gray-900">Session History</h3>
                         <div class="flex gap-3">
-                            <select class="form-input form-select" style="width: auto;">
-                                <option value="all">All Sessions</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                                <option value="teaching">Teaching</option>
-                                <option value="learning">Learning</option>
-                            </select>
-                            <select class="form-input form-select" style="width: auto;">
-                                <option value="recent">Most Recent</option>
-                                <option value="oldest">Oldest First</option>
-                                <option value="rating">Highest Rated</option>
-                            </select>
+                            <form method="GET" class="flex gap-3">
+                                <select name="filter"
+                                        class="form-input form-select"
+                                        style="width: auto"
+                                        onchange="this.form.submit()">
+                                    <option value="all" {% if request.GET.filter == 'all' %}selected{% endif %}>All Sessions</option>
+                                    <option value="completed"
+                                            {% if request.GET.filter == 'completed' %}selected{% endif %}>
+                                        Completed
+                                    </option>
+                                    <option value="cancelled"
+                                            {% if request.GET.filter == 'cancelled' %}selected{% endif %}>
+                                        Cancelled
+                                    </option>
+                                    <option value="teaching"
+                                            {% if request.GET.filter == 'teaching' %}selected{% endif %}>
+                                        Teaching
+                                    </option>
+                                    <option value="learning"
+                                            {% if request.GET.filter == 'learning' %}selected{% endif %}>
+                                        Learning
+                                    </option>
+                                </select>
+                                <select name="sort"
+                                        class="form-input form-select"
+                                        style="width: auto"
+                                        onchange="this.form.submit()">
+                                    <option value="recent"
+                                            {% if request.GET.sort == 'recent' %}selected{% endif %}>
+                                        Most Recent
+                                    </option>
+                                    <option value="oldest"
+                                            {% if request.GET.sort == 'oldest' %}selected{% endif %}>
+                                        Oldest First
+                                    </option>
+                                    <option value="rating"
+                                            {% if request.GET.sort == 'rating' %}selected{% endif %}>
+                                        Highest Rated
+                                    </option>
+                                </select>
+                            </form>
                         </div>
                     </div>
                     <div class="space-y-4">
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-start gap-4">
-                                <img src="../assets/default-avatar.png"
-                                     alt="User"
-                                     class="w-12 h-12 rounded-full">
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Advanced React Patterns</h4>
-                                            <p class="text-gray-600 text-sm">Teaching session with Jennifer Lee</p>
-                                            <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                                                <span><i class="fas fa-calendar mr-1"></i>January 10, 2024</span>
-                                                <span><i class="fas fa-clock mr-1"></i>2 hours</span>
-                                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                                                    <i class="fas fa-check mr-1"></i>Completed
-                                                </span>
+                        {% for session in session_history %}
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-start gap-4">
+                                    {% if session.teacher == request.user %}
+                                        {% with partner=session.student partner_rating=session.rating_by_student %}
+                                            <img src="{% if partner.profile.image %}{{ partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                 alt="{{ partner.profile.full_name|default:partner.username }}"
+                                                 class="w-12 h-12 rounded-full">
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <h4 class="font-semibold text-gray-900">{{ session.skill.name }}</h4>
+                                                        <p class="text-gray-600 text-sm">Teaching session with {{ partner.profile.full_name|default:partner.username }}</p>
+                                                        <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                            <span><i class="fas fa-calendar mr-1"></i>{{ session.scheduled_time|date:"F j, Y" }}</span>
+                                                            <span><i class="fas fa-clock mr-1"></i>{{ session.duration }} minutes</span>
+                                                            <span class="px-2 py-1 rounded text-xs {% if session.status == 'completed' %}bg-green-100 text-green-800 {% elif session.status == 'cancelled' %}bg-red-100 text-red-800 {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                                                <i class="fas fa-{% if session.status == 'completed' %}check{% elif session.status == 'cancelled' %}times{% else %}clock{% endif %} mr-1"></i>
+                                                                {{ session.get_status_display }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        {% if partner_rating %}
+                                                            <div class="flex items-center mb-2">
+                                                                {% for i in "12345" %}
+                                                                    {% if forloop.counter <= partner_rating %}
+                                                                        <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                                    {% else %}
+                                                                        <i class="fas fa-star text-gray-300 text-sm"></i>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <span class="ml-1 text-sm text-gray-600">{{ partner_rating }}.0</span>
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if session.status == 'completed' %}
+                                                            <button onclick="bookAgain('{{ partner.username }}')"
+                                                                    class="btn btn-primary btn-sm">
+                                                                <i class="fas fa-redo mr-1"></i>
+                                                                Book Again
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="flex items-center mb-2">
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <span class="ml-1 text-sm text-gray-600">5.0</span>
+                                        {% endwith %}
+                                    {% else %}
+                                        {% with partner=session.teacher partner_rating=session.rating_by_teacher %}
+                                            <img src="{% if partner.profile.image %}{{ partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                 alt="{{ partner.profile.full_name|default:partner.username }}"
+                                                 class="w-12 h-12 rounded-full">
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <h4 class="font-semibold text-gray-900">{{ session.skill.name }}</h4>
+                                                        <p class="text-gray-600 text-sm">Learning session with {{ partner.profile.full_name|default:partner.username }}</p>
+                                                        <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
+                                                            <span><i class="fas fa-calendar mr-1"></i>{{ session.scheduled_time|date:"F j, Y" }}</span>
+                                                            <span><i class="fas fa-clock mr-1"></i>{{ session.duration }} minutes</span>
+                                                            <span class="px-2 py-1 rounded text-xs {% if session.status == 'completed' %}bg-green-100 text-green-800 {% elif session.status == 'cancelled' %}bg-red-100 text-red-800 {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                                                <i class="fas fa-{% if session.status == 'completed' %}check{% elif session.status == 'cancelled' %}times{% else %}clock{% endif %} mr-1"></i>
+                                                                {{ session.get_status_display }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        {% if partner_rating %}
+                                                            <div class="flex items-center mb-2">
+                                                                {% for i in "12345" %}
+                                                                    {% if forloop.counter <= partner_rating %}
+                                                                        <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                                                    {% else %}
+                                                                        <i class="fas fa-star text-gray-300 text-sm"></i>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                                <span class="ml-1 text-sm text-gray-600">{{ partner_rating }}.0</span>
+                                                            </div>
+                                                        {% endif %}
+                                                        {% if session.status == 'completed' %}
+                                                            <button onclick="bookAgain('{{ partner.username }}')"
+                                                                    class="btn btn-primary btn-sm">
+                                                                <i class="fas fa-redo mr-1"></i>
+                                                                Book Again
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <button onclick="viewFeedback(1)" class="btn btn-outline btn-sm">
-                                                <i class="fas fa-comment mr-1"></i>
-                                                View Feedback
-                                            </button>
-                                        </div>
-                                    </div>
+                                        {% endwith %}
+                                    {% endif %}
                                 </div>
                             </div>
-                        </div>
-                        <div class="border border-gray-200 rounded-lg p-4">
-                            <div class="flex items-start gap-4">
-                                <img src="../assets/default-avatar.png"
-                                     alt="User"
-                                     class="w-12 h-12 rounded-full">
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900">Python Data Analysis</h4>
-                                            <p class="text-gray-600 text-sm">Learning session with David Zhang</p>
-                                            <div class="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                                                <span><i class="fas fa-calendar mr-1"></i>January 8, 2024</span>
-                                                <span><i class="fas fa-clock mr-1"></i>1.5 hours</span>
-                                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                                                    <i class="fas fa-check mr-1"></i>Completed
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="text-right">
-                                            <div class="flex items-center mb-2">
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <i class="fas fa-star text-yellow-400 text-sm"></i>
-                                                <i class="fas fa-star text-gray-300 text-sm"></i>
-                                                <span class="ml-1 text-sm text-gray-600">4.5</span>
-                                            </div>
-                                            <button onclick="bookAgain('david')" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-redo mr-1"></i>
-                                                Book Again
-                                            </button>
-                                        </div>
-                                    </div>
+                        {% empty %}
+                            <div class="text-center py-12">
+                                <div class="text-gray-400 mb-4">
+                                    <i class="fas fa-history fa-3x"></i>
                                 </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">No session history yet</h3>
+                                <p class="text-gray-600 mb-4">Complete your first session to see it here!</p>
                             </div>
+                        {% endfor %}
+                    </div>
+                    {% if session_history.has_next %}
+                        <div class="text-center py-8">
+                            <a href="?page={{ session_history.next_page_number }}"
+                               class="btn btn-outline">
+                                <i class="fas fa-chevron-down mr-2"></i>
+                                Load More Sessions
+                            </a>
                         </div>
-                    </div>
-                    <div class="text-center py-8">
-                        <button class="btn btn-outline">
-                            <i class="fas fa-chevron-down mr-2"></i>
-                            Load More Sessions
-                        </button>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
             <!-- Pending Feedback Tab -->
@@ -433,132 +547,124 @@
                 <div class="card">
                     <h3 class="font-semibold text-gray-900 mb-6">Sessions Awaiting Feedback</h3>
                     <div class="space-y-6">
-                        <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-6">
-                            <div class="flex items-start gap-4">
-                                <img src="../assets/default-avatar.png"
-                                     alt="User"
-                                     class="w-12 h-12 rounded-full">
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 mb-2">CSS Flexbox Workshop</h4>
-                                    <p class="text-gray-600 text-sm mb-4">Learning session with Tom Wilson • Completed 2 days ago</p>
-                                    <form class="space-y-4">
-                                        <div>
-                                            <label class="form-label">Rate your session</label>
-                                            <div class="flex items-center gap-1">
-                                                <button type="button"
-                                                        onclick="setRating(1, 1)"
-                                                        class="star-rating"
-                                                        data-rating="1">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                                <button type="button"
-                                                        onclick="setRating(1, 2)"
-                                                        class="star-rating"
-                                                        data-rating="2">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                                <button type="button"
-                                                        onclick="setRating(1, 3)"
-                                                        class="star-rating"
-                                                        data-rating="3">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                                <button type="button"
-                                                        onclick="setRating(1, 4)"
-                                                        class="star-rating"
-                                                        data-rating="4">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                                <button type="button"
-                                                        onclick="setRating(1, 5)"
-                                                        class="star-rating"
-                                                        data-rating="5">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
+                        {% for session in pending_feedback %}
+                            <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-6">
+                                <div class="flex items-start gap-4">
+                                    {% if session.teacher == request.user %}
+                                        {% with partner=session.student %}
+                                            <img src="{% if partner.profile.image %}{{ partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                 alt="{{ partner.profile.full_name|default:partner.username }}"
+                                                 class="w-12 h-12 rounded-full">
+                                            <div class="flex-1">
+                                                <h4 class="font-semibold text-gray-900 mb-2">{{ session.skill.name }}</h4>
+                                                <p class="text-gray-600 text-sm mb-4">
+                                                    Teaching session with {{ partner.profile.full_name|default:partner.username }}
+                                                    • Completed {{ session.scheduled_time|timesince }} ago
+                                                </p>
+                                                <form method="POST"
+                                                      action="{% url 'submit_feedback' session.id %}"
+                                                      class="space-y-4">
+                                                    {% csrf_token %}
+                                                    <div>
+                                                        <label class="form-label">Rate your session</label>
+                                                        <div class="flex items-center gap-1">
+                                                            {% for i in "12345" %}
+                                                                <button type="button"
+                                                                        onclick="setRating({{ session.id }}, {{ forloop.counter }})"
+                                                                        class="star-rating"
+                                                                        data-session="{{ session.id }}"
+                                                                        data-rating="{{ forloop.counter }}">
+                                                                    <i class="fas fa-star text-gray-300"></i>
+                                                                </button>
+                                                            {% endfor %}
+                                                        </div>
+                                                        <input type="hidden" name="rating" id="rating-{{ session.id }}" required>
+                                                    </div>
+                                                    <div>
+                                                        <label class="form-label">Share your experience</label>
+                                                        <textarea name="feedback"
+                                                                  class="form-input form-textarea"
+                                                                  placeholder="How was your teaching experience? What did you like most?"
+                                                                  required></textarea>
+                                                    </div>
+                                                    <div class="flex gap-3">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="fas fa-paper-plane mr-1"></i>
+                                                            Submit Feedback
+                                                        </button>
+                                                        <button type="button"
+                                                                onclick="skipFeedback({{ session.id }})"
+                                                                class="btn btn-outline">Skip for now</button>
+                                                    </div>
+                                                </form>
                                             </div>
-                                        </div>
-                                        <div>
-                                            <label class="form-label">Share your experience</label>
-                                            <textarea class="form-input form-textarea"
-                                                      placeholder="How was your learning experience? What did you like most?"></textarea>
-                                        </div>
-                                        <div class="flex gap-3">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-paper-plane mr-1"></i>
-                                                Submit Feedback
-                                            </button>
-                                            <button type="button" onclick="skipFeedback(1)" class="btn btn-outline">Skip for now</button>
-                                        </div>
-                                    </form>
+                                        {% endwith %}
+                                    {% else %}
+                                        {% with partner=session.teacher %}
+                                            <img src="{% if partner.profile.image %}{{ partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                 alt="{{ partner.profile.full_name|default:partner.username }}"
+                                                 class="w-12 h-12 rounded-full">
+                                            <div class="flex-1">
+                                                <h4 class="font-semibold text-gray-900 mb-2">{{ session.skill.name }}</h4>
+                                                <p class="text-gray-600 text-sm mb-4">
+                                                    Learning session with {{ partner.profile.full_name|default:partner.username }}
+                                                    • Completed {{ session.scheduled_time|timesince }} ago
+                                                </p>
+                                                <form method="POST"
+                                                      action="{% url 'submit_feedback' session.id %}"
+                                                      class="space-y-4">
+                                                    {% csrf_token %}
+                                                    <div>
+                                                        <label class="form-label">Rate your session</label>
+                                                        <div class="flex items-center gap-1">
+                                                            {% for i in "12345" %}
+                                                                <button type="button"
+                                                                        onclick="setRating({{ session.id }}, {{ forloop.counter }})"
+                                                                        class="star-rating"
+                                                                        data-session="{{ session.id }}"
+                                                                        data-rating="{{ forloop.counter }}">
+                                                                    <i class="fas fa-star text-gray-300"></i>
+                                                                </button>
+                                                            {% endfor %}
+                                                        </div>
+                                                        <input type="hidden" name="rating" id="rating-{{ session.id }}" required>
+                                                    </div>
+                                                    <div>
+                                                        <label class="form-label">Share your experience</label>
+                                                        <textarea name="feedback"
+                                                                  class="form-input form-textarea"
+                                                                  placeholder="How was your learning experience? What did you like most?"
+                                                                  required></textarea>
+                                                    </div>
+                                                    <div class="flex gap-3">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="fas fa-paper-plane mr-1"></i>
+                                                            Submit Feedback
+                                                        </button>
+                                                        <button type="button"
+                                                                onclick="skipFeedback({{ session.id }})"
+                                                                class="btn btn-outline">Skip for now</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        {% endwith %}
+                                    {% endif %}
                                 </div>
                             </div>
-                        </div>
-                        <div class="border border-yellow-200 bg-yellow-50 rounded-lg p-6">
-                            <div class="flex items-start gap-4">
-                                <img src="../assets/default-avatar.png"
-                                     alt="User"
-                                     class="w-12 h-12 rounded-full">
-                                <div class="flex-1">
-                                    <h4 class="font-semibold text-gray-900 mb-2">French Conversation Practice</h4>
-                                    <p class="text-gray-600 text-sm mb-4">Learning session with Sophie Martin • Completed 1 week ago</p>
-                                    <form class="space-y-4">
-                                        <div>
-                                            <label class="form-label">Rate your session</label>
-                                            <div class="flex items-center gap-1">
-                                                <button type="button"
-                                                        onclick="setRating(2, 1)"
-                                                        class="star-rating"
-                                                        data-rating="1">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                                <button type="button"
-                                                        onclick="setRating(2, 2)"
-                                                        class="star-rating"
-                                                        data-rating="2">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                                <button type="button"
-                                                        onclick="setRating(2, 3)"
-                                                        class="star-rating"
-                                                        data-rating="3">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                                <button type="button"
-                                                        onclick="setRating(2, 4)"
-                                                        class="star-rating"
-                                                        data-rating="4">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                                <button type="button"
-                                                        onclick="setRating(2, 5)"
-                                                        class="star-rating"
-                                                        data-rating="5">
-                                                    <i class="fas fa-star text-gray-300"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="form-label">Share your experience</label>
-                                            <textarea class="form-input form-textarea"
-                                                      placeholder="How was your learning experience? What did you like most?"></textarea>
-                                        </div>
-                                        <div class="flex gap-3">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-paper-plane mr-1"></i>
-                                                Submit Feedback
-                                            </button>
-                                            <button type="button" onclick="skipFeedback(2)" class="btn btn-outline">Skip for now</button>
-                                        </div>
-                                    </form>
+                        {% empty %}
+                            <div class="text-center py-12">
+                                <div class="text-gray-400 mb-4">
+                                    <i class="fas fa-star fa-3x"></i>
                                 </div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-2">All caught up!</h3>
+                                <p class="text-gray-600">No sessions awaiting feedback.</p>
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-    <script>
+        </main>
+        <script>
         function showTab(tabName) {
             // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(content => {
@@ -575,36 +681,46 @@
             document.getElementById(tabName + 'Tab').classList.add('active');
         }
 
-        function acceptRequest(requestId) {
-            alert(`Request ${requestId} accepted! Redirecting to scheduling...`);
-        }
-
-        function declineRequest(requestId) {
-            if (confirm('Are you sure you want to decline this request?')) {
-                alert(`Request ${requestId} declined.`);
-            }
-        }
-
-        function cancelRequest(requestId) {
-            if (confirm('Are you sure you want to cancel this request?')) {
-                alert(`Request ${requestId} cancelled.`);
-            }
+        function joinSession(sessionId) {
+            // In a real implementation, this would open a video call or redirect to meeting
+            alert(`Joining session ${sessionId}... This would open your video call interface.`);
         }
 
         function rescheduleSession(sessionId) {
-            alert(`Opening reschedule dialog for session ${sessionId}...`);
+            // Open reschedule modal or redirect to scheduling page
+            if (confirm('Would you like to reschedule this session?')) {
+                window.location.href = `/sessions/reschedule/${sessionId}/`;
+            }
         }
 
         function prepareSession(sessionId) {
-            alert(`Opening session preparation for session ${sessionId}...`);
+            // Open session preparation interface
+            window.location.href = `/sessions/prepare/${sessionId}/`;
         }
 
-        function sendMessage(userId) {
-            alert(`Opening chat with ${userId}...`);
+        function sendMessage(username) {
+            // Redirect to messaging system
+            window.location.href = `/messages/chat/${username}/`;
+        }
+
+        function viewSession(requestId) {
+            // View session details
+            window.location.href = `/sessions/view/${requestId}/`;
+        }
+
+        function findAlternative(skillName) {
+            // Redirect to matching with skill filter
+            window.location.href = `/matching/?skill_filter=${encodeURIComponent(skillName)}`;
+        }
+
+        function bookAgain(username) {
+            // Redirect to user profile or matching
+            window.location.href = `/users/${username}/`;
         }
 
         function setRating(sessionId, rating) {
-            const sessionRatings = document.querySelectorAll(`[onclick*="setRating(${sessionId}"]`);
+            // Update visual stars
+            const sessionRatings = document.querySelectorAll(`[data-session="${sessionId}"]`);
             sessionRatings.forEach((star, index) => {
                 const icon = star.querySelector('i');
                 if (index < rating) {
@@ -613,11 +729,30 @@
                     icon.className = 'fas fa-star text-gray-300';
                 }
             });
+            
+            // Set hidden input value
+            const ratingInput = document.getElementById(`rating-${sessionId}`);
+            if (ratingInput) {
+                ratingInput.value = rating;
+            }
         }
 
         function skipFeedback(sessionId) {
-            if (confirm('Skip feedback for this session? You can provide it later.')) {
-                alert(`Feedback skipped for session ${sessionId}.`);
+            if (confirm('Skip feedback for this session? You can provide it later from your session history.')) {
+                // Make AJAX call to mark feedback as skipped
+                fetch(`/sessions/skip-feedback/${sessionId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
             }
         }
 
@@ -649,7 +784,22 @@
                 cursor: pointer;
                 padding: 2px;
             }
+            .grid-2 {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+            @media (max-width: 768px) {
+                .grid-2 {
+                    grid-template-columns: 1fr;
+                }
+            }
         `;
         document.head.appendChild(style);
-    </script>
-{% endblock content %}
+
+        // Auto-refresh pending feedback count
+        setInterval(function() {
+            // Optional: Auto-refresh to check for new requests/sessions
+            // This could be replaced with WebSocket connections for real-time updates
+        </script>
+    {% endblock content %}

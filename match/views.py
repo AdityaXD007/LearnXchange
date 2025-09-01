@@ -5,7 +5,12 @@ from django.db.models import Q, Count, Avg
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.views.decorators.http import require_POST
-from .models import Profile, Skill, UserSkill, SessionRequest
+from django.core.paginator import Paginator
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from .models import Profile, Skill, UserSkill, SessionRequest, LearningSession
 
 @login_required
 def matching_view(request):
@@ -313,3 +318,332 @@ def user_profile_view(request, username):
     }
     
     return render(request, 'user_profile.html', context)
+
+
+
+@login_required
+def sessions_view(request):
+    """Main sessions dashboard view"""
+    current_user = request.user
+    today = timezone.now().date()
+    week_start = today
+    week_end = today + timedelta(days=7)
+    
+    # Get today's sessions
+    today_sessions = LearningSession.objects.filter(
+        Q(student=current_user) | Q(teacher=current_user),
+        scheduled_time__date=today,
+        status='scheduled'
+    ).select_related('student', 'teacher', 'skill', 'student__profile', 'teacher__profile').order_by('scheduled_time')
+    
+    # Get this week's sessions (excluding today)
+    week_sessions = LearningSession.objects.filter(
+        Q(student=current_user) | Q(teacher=current_user),
+        scheduled_time__date__gt=today,
+        scheduled_time__date__lte=week_end,
+        status='scheduled'
+    ).select_related('student', 'teacher', 'skill', 'student__profile', 'teacher__profile').order_by('scheduled_time')
+    
+    # Get session requests
+    sent_requests = SessionRequest.objects.filter(
+        requester=current_user
+    ).select_related('partner', 'partner__profile').order_by('-created_at')
+    
+    received_requests = SessionRequest.objects.filter(
+        partner=current_user,
+        status='pending'
+    ).select_related('requester', 'requester__profile').order_by('-created_at')
+    
+    # Get session history with filtering and sorting
+    filter_type = request.GET.get('filter', 'all')
+    sort_type = request.GET.get('sort', 'recent')
+    
+    # Base query for session history
+    history_query = LearningSession.objects.filter(
+        Q(student=current_user) | Q(teacher=current_user),
+        status__in=['completed', 'cancelled', 'no_show']
+    ).select_related('student', 'teacher', 'skill', 'student__profile', 'teacher__profile')
+    
+    # Apply filters
+    if filter_type == 'completed':
+        history_query = history_query.filter(status='completed')
+    elif filter_type == 'cancelled':
+        history_query = history_query.filter(status__in=['cancelled', 'no_show'])
+    elif filter_type == 'teaching':
+        history_query = history_query.filter(teacher=current_user)
+    elif filter_type == 'learning':
+        history_query = history_query.filter(student=current_user)
+    
+    # Apply sorting
+    if sort_type == 'oldest':
+        history_query = history_query.order_by('scheduled_time')
+    elif sort_type == 'rating':
+        history_query = history_query.filter(
+            Q(rating_by_student__isnull=False) | Q(rating_by_teacher__isnull=False)
+        ).order_by('-rating_by_student', '-rating_by_teacher')
+    else:  # recent
+        history_query = history_query.order_by('-scheduled_time')
+    
+    # Paginate session history
+    paginator = Paginator(history_query, 10)
+    page_number = request.GET.get('page')
+    session_history = paginator.get_page(page_number)
+    
+    # Get sessions awaiting feedback
+    pending_feedback = LearningSession.objects.filter(
+        Q(
+            student=current_user,
+            rating_by_student__isnull=True,
+            status='completed'
+        ) | Q(
+            teacher=current_user,
+            rating_by_teacher__isnull=True,
+            status='completed'
+        )
+    ).select_related('student', 'teacher', 'skill', 'student__profile', 'teacher__profile').order_by('-scheduled_time')
+    
+    context = {
+        'today': today,
+        'today_sessions': today_sessions,
+        'week_sessions': week_sessions,
+        'upcoming_sessions': list(today_sessions) + list(week_sessions),
+        'sent_requests': sent_requests,
+        'received_requests': received_requests,
+        'session_history': session_history,
+        'pending_feedback': pending_feedback,
+        'filter_type': filter_type,
+        'sort_type': sort_type,
+    }
+    
+    return render(request, 'home/sessions.html', context)
+
+
+@login_required
+@require_POST
+def handle_session_request(request, request_id):
+    """Handle accepting/declining session requests"""
+    session_request = get_object_or_404(
+        SessionRequest, 
+        id=request_id, 
+        partner=request.user,
+        status='pending'
+    )
+    
+    action = request.POST.get('action')
+    
+    if action == 'accept':
+        session_request.status = 'accepted'
+        session_request.save()
+        messages.success(
+            request, 
+            f'Session request from {session_request.requester.username} accepted! You can now schedule the session.'
+        )
+        
+        # Optional: Create a learning session automatically or redirect to scheduling
+        # create_learning_session_from_request(session_request)
+        
+    elif action == 'decline':
+        session_request.status = 'declined'
+        session_request.save()
+        messages.info(
+            request, 
+            f'Session request from {session_request.requester.username} declined.'
+        )
+    else:
+        messages.error(request, 'Invalid action')
+    
+    return redirect('sessions')
+
+
+@login_required
+@require_POST 
+def cancel_session_request(request, request_id):
+    """Cancel a sent session request"""
+    session_request = get_object_or_404(
+        SessionRequest,
+        id=request_id,
+        requester=request.user,
+        status='pending'
+    )
+    
+    session_request.status = 'cancelled'
+    session_request.save()
+    
+    messages.info(request, f'Your session request to {session_request.partner.username} has been cancelled.')
+    return redirect('sessions')
+
+
+@login_required
+@require_POST
+def submit_feedback(request, session_id):
+    """Submit feedback for a completed session"""
+    session = get_object_or_404(
+        LearningSession,
+        id=session_id,
+        status='completed'
+    )
+    
+    # Verify user is part of this session
+    if request.user not in [session.student, session.teacher]:
+        messages.error(request, 'You are not authorized to provide feedback for this session.')
+        return redirect('sessions')
+    
+    rating = request.POST.get('rating')
+    feedback_text = request.POST.get('feedback')
+    
+    try:
+        rating = int(rating)
+        if rating < 1 or rating > 5:
+            raise ValueError("Invalid rating")
+    except (ValueError, TypeError):
+        messages.error(request, 'Please provide a valid rating between 1 and 5.')
+        return redirect('sessions')
+    
+    # Save feedback based on user role
+    if session.student == request.user:
+        session.rating_by_student = rating
+        session.feedback_by_student = feedback_text
+    else:  # teacher
+        session.rating_by_teacher = rating
+        session.feedback_by_teacher = feedback_text
+    
+    session.save()
+    
+    # Update partner's profile rating
+    update_user_rating(session.teacher if session.student == request.user else session.student)
+    
+    messages.success(request, 'Thank you for your feedback!')
+    return redirect('sessions')
+
+
+@login_required
+@require_POST
+def skip_feedback(request, session_id):
+    """Skip feedback for now (AJAX endpoint)"""
+    session = get_object_or_404(
+        LearningSession,
+        id=session_id,
+        status='completed'
+    )
+    
+    # Verify user is part of this session
+    if request.user not in [session.student, session.teacher]:
+        return JsonResponse({'success': False, 'error': 'Unauthorized'})
+    
+    # For now, we'll just return success
+    # In a full implementation, you might want to track skipped feedback
+    return JsonResponse({'success': True})
+
+
+@login_required
+def reschedule_session(request, session_id):
+    """Reschedule a session"""
+    session = get_object_or_404(
+        LearningSession,
+        id=session_id,
+        status='scheduled'
+    )
+    
+    # Verify user is part of this session
+    if request.user not in [session.student, session.teacher]:
+        messages.error(request, 'You are not authorized to reschedule this session.')
+        return redirect('sessions')
+    
+    if request.method == 'POST':
+        new_datetime = request.POST.get('new_datetime')
+        try:
+            new_datetime = datetime.fromisoformat(new_datetime.replace('Z', '+00:00'))
+            session.scheduled_time = new_datetime
+            session.save()
+            
+            # Notify the other party (in a real app, send email/notification)
+            partner = session.teacher if session.student == request.user else session.student
+            messages.success(
+                request, 
+                f'Session rescheduled successfully. {partner.username} has been notified.'
+            )
+            return redirect('sessions')
+            
+        except ValueError:
+            messages.error(request, 'Invalid date and time format.')
+    
+    # Render reschedule form
+    context = {
+        'session': session,
+    }
+    return render(request, 'reschedule_session.html', context)
+
+
+@login_required
+def prepare_session(request, session_id):
+    """Prepare for teaching a session"""
+    session = get_object_or_404(
+        LearningSession,
+        id=session_id,
+        teacher=request.user,
+        status='scheduled'
+    )
+    
+    if request.method == 'POST':
+        notes = request.POST.get('notes')
+        session.notes = notes
+        session.save()
+        
+        messages.success(request, 'Session preparation saved successfully!')
+        return redirect('sessions')
+    
+    context = {
+        'session': session,
+    }
+    return render(request, 'prepare_session.html', context)
+
+
+def update_user_rating(user):
+    """Update a user's average rating based on received feedback"""
+    from django.db.models import Avg
+    
+    # Calculate average rating from teaching sessions
+    avg_rating = LearningSession.objects.filter(
+        teacher=user,
+        rating_by_student__isnull=False,
+        status='completed'
+    ).aggregate(avg_rating=Avg('rating_by_student'))['avg_rating']
+    
+    if avg_rating:
+        profile, created = Profile.objects.get_or_create(user=user)
+        profile.rating = round(avg_rating, 1)
+        
+        # Also update session count
+        session_count = LearningSession.objects.filter(
+            Q(teacher=user) | Q(student=user),
+            status='completed'
+        ).count()
+        profile.sessions = session_count
+        profile.save()
+
+
+def create_learning_session_from_request(session_request):
+    """Create a LearningSession from an accepted SessionRequest"""
+    # This is a helper function that you can call when a request is accepted
+    # You might want to redirect to a scheduling page instead
+    
+    try:
+        skill = Skill.objects.get(name=session_request.skill_to_learn)
+        
+        # Create session (you'll need to handle scheduling)
+        session = LearningSession.objects.create(
+            request=session_request,
+            student=session_request.requester,
+            teacher=session_request.partner,
+            skill=skill,
+            scheduled_time=timezone.now() + timedelta(days=1),  # Default to tomorrow
+            duration=session_request.session_length,
+            status='scheduled'
+        )
+        
+        return session
+        
+    except Skill.DoesNotExist:
+        # Handle case where skill doesn't exist
+        return None
+

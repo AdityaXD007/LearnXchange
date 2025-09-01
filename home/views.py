@@ -20,10 +20,6 @@ def dashboard(request):
     return render(request, 'home/dashboard.html')
 
 @login_required
-def sessions(request):
-    return render(request, 'home/sessions.html')
-
-@login_required
 def calendar(request):
     return render(request, 'home/calendar.html')
 
