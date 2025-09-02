@@ -664,27 +664,53 @@
                 </div>
             </div>
         </main>
+        <style>
+            .tab-content {
+                display: none;
+                padding: 1.5rem;
+            }
+
+            .tab-content:first-of-type,
+            #upcomingContent {
+                display: block !important;
+            }
+        </style>
         <script>
-        function showTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
+            
+            function showTab(tabName) {
+                console.log('Switching to tab:', tabName); // Debug line
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.style.display = 'none';
+                });
 
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
+                // Remove active class from all tabs  
+                document.querySelectorAll('.tab-button').forEach(button => {
+                    button.classList.remove('active');
+                });
 
-            // Show selected tab content and add active class
-            document.getElementById(tabName + 'Content').style.display = 'block';
-            document.getElementById(tabName + 'Tab').classList.add('active');
-        }
-
-        function joinSession(sessionId) {
-            // In a real implementation, this would open a video call or redirect to meeting
-            alert(`Joining session ${sessionId}... This would open your video call interface.`);
-        }
+                // Show selected tab content and add active class
+                const contentId = tabName + 'Content';
+                const tabId = tabName + 'Tab';
+                
+                console.log('Looking for elements:', contentId, tabId); // Debug line
+                
+                const content = document.getElementById(contentId);
+                const tab = document.getElementById(tabId);
+                
+                if (content) {
+                    content.style.display = 'block';
+                } else {
+                    console.error('Content element not found:', contentId);
+                }
+                
+                if (tab) {
+                    tab.classList.add('active');
+                } else {
+                    console.error('Tab element not found:', tabId);
+                }
+            }
 
         function rescheduleSession(sessionId) {
             // Open reschedule modal or redirect to scheduling page
@@ -797,9 +823,11 @@
         `;
         document.head.appendChild(style);
 
-        // Auto-refresh pending feedback count
-        setInterval(function() {
-            // Optional: Auto-refresh to check for new requests/sessions
-            // This could be replaced with WebSocket connections for real-time updates
+
+    // Auto-refresh pending feedback count
+    setInterval(function() {
+        // Optional: Auto-refresh to check for new requests/sessions
+        // This could be replaced with WebSocket connections for real-time updates
+    }, 30000); // Add interval time and close properly
         </script>
     {% endblock content %}
