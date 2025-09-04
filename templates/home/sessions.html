@@ -218,7 +218,7 @@
                         </div>
                     {% endif %}
                     {% if not today_sessions and not week_sessions %}
-                        <div class="text-center py-12">
+                        <div id="noUpcomingSessions" class="text-center py-12">
                             <div class="text-gray-400 mb-4">
                                 <i class="fas fa-calendar-times fa-3x"></i>
                             </div>
@@ -243,8 +243,8 @@
                                 <div class="border border-gray-200 rounded-lg p-4">
                                     <div class="flex items-start gap-3">
                                         <img src="{% if request.requester.profile.image %}{{ request.requester.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
-                                             alt="{{ request.requester.profile.full_name|default:request.requester.username }}"
-                                             class="w-10 h-10 rounded-full">
+                                                alt="{{ request.requester.profile.full_name|default:request.requester.username }}"
+                                                class="w-10 h-10 rounded-full object-cover">
                                         <div class="flex-1">
                                             <div class="flex items-center justify-between mb-2">
                                                 <h4 class="font-medium">{{ request.requester.profile.full_name|default:request.requester.username }}</h4>
@@ -316,9 +316,12 @@
                             {% for request in sent_requests %}
                                 <div class="border {% if request.status == 'pending' %}border-yellow-200 bg-yellow-50 {% elif request.status == 'accepted' %}border-green-200 bg-green-50 {% elif request.status == 'declined' %}border-red-200 bg-red-50 {% else %}border-gray-200{% endif %} rounded-lg p-4">
                                     <div class="flex items-start gap-3">
-                                        <img src="{% if request.partner.profile.image %}{{ request.partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
-                                             alt="{{ request.partner.profile.full_name|default:request.partner.username }}"
-                                             class="w-10 h-10 rounded-full">
+                                        <div class="w-16 h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm bg-gray-100">
+                                            <div class="profile-avatar">
+                                                <img src="{% if request.partner.profile.image %}{{ request.partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                    alt="{{ request.partner.profile.full_name|default:request.partner.username }}">
+                                            </div>
+                                        </div>
                                         <div class="flex-1">
                                             <div class="flex items-center justify-between mb-2">
                                                 <h4 class="font-medium">{{ request.partner.profile.full_name|default:request.partner.username }}</h4>
@@ -335,8 +338,8 @@
                                             <div class="flex gap-2">
                                                 {% if request.status == 'pending' %}
                                                     <form method="post"
-                                                          action="{% url 'cancel_session_request' request.id %}"
-                                                          class="inline">
+                                                            action="{% url 'cancel_session_request' request.id %}"
+                                                            class="inline">
                                                         {% csrf_token %}
                                                         <button type="submit"
                                                                 class="btn btn-outline btn-sm"
@@ -676,42 +679,32 @@
             }
         </style>
         <script>
-            
-            function showTab(tabName) {
-                console.log('Switching to tab:', tabName); // Debug line
-                
-                // Hide all tab contents
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.style.display = 'none';
-                });
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
 
-                // Remove active class from all tabs  
-                document.querySelectorAll('.tab-button').forEach(button => {
-                    button.classList.remove('active');
-                });
-
-                // Show selected tab content and add active class
-                const contentId = tabName + 'Content';
-                const tabId = tabName + 'Tab';
-                
-                console.log('Looking for elements:', contentId, tabId); // Debug line
-                
-                const content = document.getElementById(contentId);
-                const tab = document.getElementById(tabId);
-                
-                if (content) {
-                    content.style.display = 'block';
-                } else {
-                    console.error('Content element not found:', contentId);
-                }
-                
-                if (tab) {
-                    tab.classList.add('active');
-                } else {
-                    console.error('Tab element not found:', tabId);
-                }
+            // Hide the no sessions message specifically
+            const noSessionsMsg = document.getElementById('noUpcomingSessions');
+            if (noSessionsMsg) {
+                noSessionsMsg.style.display = 'none';
             }
 
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab content and add active class
+            document.getElementById(tabName + 'Content').style.display = 'block';
+            document.getElementById(tabName + 'Tab').classList.add('active');
+
+            // Show no sessions message only for upcoming tab when appropriate
+            if (tabName === 'upcoming' && noSessionsMsg) {
+                noSessionsMsg.style.display = 'block';
+            }
+        }
         function rescheduleSession(sessionId) {
             // Open reschedule modal or redirect to scheduling page
             if (confirm('Would you like to reschedule this session?')) {

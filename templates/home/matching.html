@@ -235,8 +235,9 @@
                                                 </div>
                                                 <div class="text-xs text-gray-500 mb-3">Match Score</div>
                                                 <div class="space-y-2">
-                                                    
-                                                    <button type="button" onclick="requestSession('{{ match.user.username }}')" class="btn btn-primary btn-sm w-full">Send Request</button>
+                                                    <button type="button"
+                                                            onclick="requestSession('{{ match.user.username }}')"
+                                                            class="btn btn-primary btn-sm w-full">Send Request</button>
                                                     <button onclick="sendMessage('{{ match.user.username }}')"
                                                             class="btn btn-outline btn-sm w-full">
                                                         <i class="fas fa-message mr-1"></i>
@@ -274,62 +275,64 @@
     </main>
     <!-- Request Session Modal -->
     <div id="requestSessionModal" class="modal">
-    <div class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Request Learning Session</h3>
-                <button type="button" onclick="closeModal(document.getElementById('requestSessionModal'))">
-                    <i class="fas fa-times"></i>
-                </button>
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Request Learning Session</h3>
+                    <button type="button"
+                            onclick="closeModal(document.getElementById('requestSessionModal'))">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form method="POST" action="{% url 'request_session' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="partner_username" id="partnerUsername">
+                    <div>
+                        <!-- What would you like to learn? -->
+                        <label for="learning-skill" class="form-label">What would you like to learn?</label>
+                        <select id="learning-skill"
+                                name="learning_skill"
+                                class="form-select"
+                                required>
+                            <option value="" selected>Select a skill</option>
+                            {% for skill in current_user_learning %}
+                                <option value="{{ skill }}">{{ skill }}</option>
+                            {% empty %}
+                                <option disabled>(no learning skills found)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <!-- What can you teach in return? -->
+                        <label for="teaching-skill" class="form-label mt-3">What can you teach in return?</label>
+                        <select id="teaching-skill"
+                                name="teaching_skill"
+                                class="form-select"
+                                required>
+                            <option value="" selected>Select a skill</option>
+                            {% for skill in current_user_teaching %}
+                                <option value="{{ skill }}">{{ skill }}</option>
+                            {% empty %}
+                                <option disabled>(no teaching skills found)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Session length</label>
+                        <select name="session_length" required>
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="120">2 hour</option>
+                            <option value="180">3 hour</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Request</button>
+                    <button type="button"
+                            onclick="closeModal(document.getElementById('requestSessionModal'))">Cancel</button>
+                </form>
             </div>
-            
-            <form method="POST" action="{% url 'request_session' %}">
-                {% csrf_token %}
-                <input type="hidden" name="partner_username" id="partnerUsername">
-                
-                <div>
-                    <!-- What would you like to learn? -->
-                    <label for="learning-skill" class="form-label">What would you like to learn?</label>
-                    <select id="learning-skill" name="learning_skill" class="form-select" required>
-                    <option value="" selected>Select a skill</option>
-                    {% for skill in current_user_learning %}
-                        <option value="{{ skill }}">{{ skill }}</option>
-                    {% empty %}
-                        <option disabled>(no learning skills found)</option>
-                    {% endfor %}
-                    </select>
-
-                </div>
-                
-                <div>
-                    <!-- What can you teach in return? -->
-                    <label for="teaching-skill" class="form-label mt-3">What can you teach in return?</label>
-                    <select id="teaching-skill" name="teaching_skill" class="form-select" required>
-                    <option value="" selected>Select a skill</option>
-                    {% for skill in current_user_teaching %}
-                        <option value="{{ skill }}">{{ skill }}</option>
-                    {% empty %}
-                        <option disabled>(no teaching skills found)</option>
-                    {% endfor %}
-                    </select>
-                </div>
-                
-                <div>
-                    <label>Session length</label>
-                    <select name="session_length" required>
-                        <option value="30">30 minutes</option>
-                        <option value="60">1 hour</option>
-                        <option value="120">2 hour</option>
-                        <option value="180">3 hour</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Send Request</button>
-                <button type="button" onclick="closeModal(document.getElementById('requestSessionModal'))">Cancel</button>
-            </form>
         </div>
     </div>
-</div>
     <script>
         function toggleFilters() {
             const filters = document.getElementById('advancedFilters');

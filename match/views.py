@@ -192,18 +192,29 @@ def is_user_online(user):
         return user.last_login > timezone.now() - timedelta(minutes=30)
     return False
 
-
 @login_required
 @require_POST
 def request_session(request):
     """Handle session request creation"""
     partner_username = request.POST.get('partner_username')
-    skill_to_learn = request.POST.get('skill_to_learn')
-    skill_to_teach = request.POST.get('skill_to_teach')
+    
+    # Fix: Use the correct field names from your form
+    skill_to_learn = request.POST.get('learning_skill')  # Changed from 'skill_to_learn'
+    skill_to_teach = request.POST.get('teaching_skill')  # Changed from 'skill_to_teach'
     session_length = request.POST.get('session_length')
     message = request.POST.get('message', '')
     
+    print(f"Received request data:")
+    print(f"Partner: {partner_username}")
+    print(f"Skill to learn: {skill_to_learn}")
+    print(f"Skill to teach: {skill_to_teach}")
+    print(f"Session length: {session_length}")
+    
     try:
+        if not partner_username:
+            messages.error(request, 'Partner username is required')
+            return redirect('matching')
+            
         partner = User.objects.get(username=partner_username)
         
         # Check if request already exists
@@ -216,23 +227,25 @@ def request_session(request):
         if existing_request:
             messages.warning(request, f'You already have a pending request with {partner.username}')
         else:
-            # Create new session request
+            # Create new session request with correct field values
             session_request = SessionRequest.objects.create(
                 requester=request.user,
                 partner=partner,
-                skill_to_learn=skill_to_learn,
-                skill_to_teach=skill_to_teach,
-                session_length=int(session_length),
+                skill_to_learn=skill_to_learn or 'General Learning',
+                skill_to_teach=skill_to_teach or 'General Teaching', 
+                session_length=int(session_length) if session_length else 60,
                 message=message
             )
             messages.success(request, f'Session request sent to {partner.username}!')
+            print(f"Successfully created session request: {session_request.id}")
     
     except User.DoesNotExist:
-        messages.error(request, 'User not found')
+        messages.error(request, f'User "{partner_username}" not found')
     except ValueError:
         messages.error(request, 'Invalid session length')
     except Exception as e:
-        messages.error(request, 'Something went wrong. Please try again.')
+        messages.error(request, f'Something went wrong: {str(e)}')
+        print(f"Error: {e}")
     
     return redirect('matching')
 
@@ -264,7 +277,7 @@ def handle_session_request(request, request_id):
         SessionRequest, 
         id=request_id, 
         partner=request.user,
-        status='pending'  # Only allow handling pending requests
+        status='pending'
     )
     
     action = request.POST.get('action')
@@ -274,8 +287,11 @@ def handle_session_request(request, request_id):
         session_request.save()
         messages.success(
             request, 
-            f'Session request from {session_request.requester.username} accepted!'
+            f'Session request from {session_request.requester.username} accepted! You can now schedule the session.'
         )
+        
+        # Optional: Create a learning session automatically or redirect to scheduling
+        # create_learning_session_from_request(session_request)
         
     elif action == 'decline':
         session_request.status = 'declined'
@@ -287,7 +303,9 @@ def handle_session_request(request, request_id):
     else:
         messages.error(request, 'Invalid action')
     
-    return redirect('session_requests')
+    return redirect('sessions')
+
+
 
 
 @login_required
@@ -416,44 +434,6 @@ def sessions_view(request):
     }
     
     return render(request, 'home/sessions.html', context)
-
-
-@login_required
-@require_POST
-def handle_session_request(request, request_id):
-    """Handle accepting/declining session requests"""
-    session_request = get_object_or_404(
-        SessionRequest, 
-        id=request_id, 
-        partner=request.user,
-        status='pending'
-    )
-    
-    action = request.POST.get('action')
-    
-    if action == 'accept':
-        session_request.status = 'accepted'
-        session_request.save()
-        messages.success(
-            request, 
-            f'Session request from {session_request.requester.username} accepted! You can now schedule the session.'
-        )
-        
-        # Optional: Create a learning session automatically or redirect to scheduling
-        # create_learning_session_from_request(session_request)
-        
-    elif action == 'decline':
-        session_request.status = 'declined'
-        session_request.save()
-        messages.info(
-            request, 
-            f'Session request from {session_request.requester.username} declined.'
-        )
-    else:
-        messages.error(request, 'Invalid action')
-    
-    return redirect('sessions')
-
 
 @login_required
 @require_POST 
