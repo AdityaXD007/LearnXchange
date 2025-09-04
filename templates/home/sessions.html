@@ -242,9 +242,11 @@
                             {% for request in received_requests %}
                                 <div class="border border-gray-200 rounded-lg p-4">
                                     <div class="flex items-start gap-3">
-                                        <img src="{% if request.requester.profile.image %}{{ request.requester.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                        <div class="custom-avatar-container">
+                                            <img src="{% if request.requester.profile.image %}{{ request.requester.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
                                                 alt="{{ request.requester.profile.full_name|default:request.requester.username }}"
-                                                class="w-10 h-10 rounded-full object-cover">
+                                                class="custom-avatar-image">
+                                        </div>
                                         <div class="flex-1">
                                             <div class="flex items-center justify-between mb-2">
                                                 <h4 class="font-medium">{{ request.requester.profile.full_name|default:request.requester.username }}</h4>
@@ -316,11 +318,11 @@
                             {% for request in sent_requests %}
                                 <div class="border {% if request.status == 'pending' %}border-yellow-200 bg-yellow-50 {% elif request.status == 'accepted' %}border-green-200 bg-green-50 {% elif request.status == 'declined' %}border-red-200 bg-red-50 {% else %}border-gray-200{% endif %} rounded-lg p-4">
                                     <div class="flex items-start gap-3">
-                                        <div class="w-16 h-16 rounded-full overflow-hidden border border-gray-200 shadow-sm bg-gray-100">
-                                            <div class="profile-avatar">
-                                                <img src="{% if request.partner.profile.image %}{{ request.partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
-                                                    alt="{{ request.partner.profile.full_name|default:request.partner.username }}">
-                                            </div>
+                                        <!-- Custom avatar container with unique ID -->
+                                        <div id="avatar-container-{{ request.id }}" class="custom-avatar-container">
+                                            <img src="{% if request.partner.profile.image %}{{ request.partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                                alt="{{ request.partner.profile.full_name|default:request.partner.username }}"
+                                                class="custom-avatar-image">
                                         </div>
                                         <div class="flex-1">
                                             <div class="flex items-center justify-between mb-2">
@@ -668,15 +670,24 @@
             </div>
         </main>
         <style>
-            .tab-content {
-                display: none;
-                padding: 1.5rem;
-            }
-
-            .tab-content:first-of-type,
-            #upcomingContent {
-                display: block !important;
-            }
+            
+    .custom-avatar-container {
+        width: 140px;
+        height: 120px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: #f3f4f6;
+    }
+    
+    .custom-avatar-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
         </style>
         <script>
         function showTab(tabName) {
