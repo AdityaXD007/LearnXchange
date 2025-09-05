@@ -19,10 +19,6 @@ def index(request):
 def dashboard(request):
     return render(request, 'home/dashboard.html')
 
-@login_required
-def calendar(request):
-    return render(request, 'home/calendar.html')
-
 def base(request):
     return render(request, 'base/base.html')
 

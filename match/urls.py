@@ -20,4 +20,7 @@ urlpatterns = [
     path('sessions/<int:session_id>/skip-feedback/', views.skip_feedback, name='skip_feedback'),
     path('sessions/<int:session_id>/reschedule/', views.reschedule_session, name='reschedule_session'),
     path('sessions/<int:session_id>/prepare/', views.prepare_session, name='prepare_session'),
+    
+    # Add these to your urlpatterns if needed
+    path('users/<str:username>/', views.user_profile_view, name='user_profile'),
 ]

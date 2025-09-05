@@ -1,0 +1,238 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <div class="page-header">
+        <div class="container">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'sessions' %}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Sessions
+                </a>
+                <div>
+                    <h1 class="page-title">Schedule Session</h1>
+                    <p class="page-description">Choose a time for your learning session</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="max-w-2xl mx-auto">
+            <!-- Session Details Card -->
+            <div class="card mb-6">
+                <div class="card-header">
+                    <h3 class="card-title">Session Details</h3>
+                </div>
+                <div class="flex items-start gap-4">
+                    <img src="{% if partner.profile.image %}{{ partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                         alt="{{ partner.profile.full_name|default:partner.username }}"
+                         class="w-16 h-16 rounded-full">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-900 mb-2">
+                            {% if is_requester %}
+                                Learning {{ session_request.skill_to_learn }} from {{ partner.profile.full_name|default:partner.username }}
+                            {% else %}
+                                Teaching {{ session_request.skill_to_learn }} to {{ partner.profile.full_name|default:partner.username }}
+                            {% endif %}
+                        </h4>
+                        <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                            <div>
+                                <span class="font-medium">Duration:</span> {{ session_request.session_length }} minutes
+                            </div>
+                            <div>
+                                <span class="font-medium">Format:</span> Online Video Call
+                            </div>
+                            <div>
+                                <span class="font-medium">Skill Level:</span> Beginner to Intermediate
+                            </div>
+                            <div>
+                                <span class="font-medium">Exchange:</span> {{ session_request.skill_to_teach }}
+                            </div>
+                        </div>
+                        {% if session_request.message %}
+                            <div class="mt-3 p-3 bg-gray-50 rounded">
+                                <p class="text-sm text-gray-700">
+                                    <strong>Message:</strong> {{ session_request.message }}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scheduling Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Choose Date & Time</h3>
+                    <p class="text-sm text-gray-600">Select a convenient time for both participants</p>
+                </div>
+
+                <form method="POST" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Date & Time Selection -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="scheduled_datetime" class="form-label">
+                                Select Date & Time
+                            </label>
+                            <input type="datetime-local" 
+                                   id="scheduled_datetime" 
+                                   name="scheduled_datetime"
+                                   class="form-input"
+                                   min="{{ today_min }}"
+                                   required>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Choose a time that works for both you and {{ partner.profile.full_name|default:partner.username }}
+                            </p>
+                        </div>
+
+                        <!-- Quick Time Suggestions -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            <button type="button" class="time-suggestion btn btn-outline btn-sm" data-hours="2">
+                                In 2 hours
+                            </button>
+                            <button type="button" class="time-suggestion btn btn-outline btn-sm" data-hours="24">
+                                Tomorrow
+                            </button>
+                            <button type="button" class="time-suggestion btn btn-outline btn-sm" data-hours="72">
+                                In 3 days
+                            </button>
+                            <button type="button" class="time-suggestion btn btn-outline btn-sm" data-hours="168">
+                                Next week
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Session Notes -->
+                    <div>
+                        <label for="notes" class="form-label">
+                            Session Plan (Optional)
+                            {% if not is_requester %}
+                                <span class="text-red-500">*</span>
+                            {% endif %}
+                        </label>
+                        <textarea id="notes" 
+                                  name="notes"
+                                  class="form-input form-textarea"
+                                  rows="4"
+                                  placeholder="{% if is_requester %}Any specific topics you'd like to focus on?{% else %}What will you cover in this session? Any preparation needed?{% endif %}"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">
+                            {% if is_requester %}
+                                Share what you'd like to learn or any specific questions you have
+                            {% else %}
+                                Outline what you plan to teach and any materials needed
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Session Guidelines -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 class="font-medium text-blue-900 mb-2">Session Guidelines</h4>
+                        <ul class="text-sm text-blue-800 space-y-1">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-blue-600 mt-0.5 text-xs"></i>
+                                Join the meeting room 5 minutes before the scheduled time
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-blue-600 mt-0.5 text-xs"></i>
+                                Have a stable internet connection and quiet environment
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-blue-600 mt-0.5 text-xs"></i>
+                                Be respectful and patient with your learning partner
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-blue-600 mt-0.5 text-xs"></i>
+                                Provide honest feedback after the session
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-4 pt-4">
+                        <button type="submit" class="btn btn-primary flex-1">
+                            <i class="fas fa-calendar-check mr-2"></i>
+                            Schedule Session
+                        </button>
+                        <a href="{% url 'sessions' %}" class="btn btn-outline">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    .grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @media (min-width: 768px) {
+        .md\:grid-cols-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+    
+    .time-suggestion.active {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+</style>
+
+<script>
+    // Set minimum date to current time + 1 hour
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
+    const minDateTime = now.toISOString().slice(0, 16);
+    document.getElementById('scheduled_datetime').min = minDateTime;
+
+    // Quick time suggestions
+    document.querySelectorAll('.time-suggestion').forEach(button => {
+        button.addEventListener('click', function() {
+            const hours = parseInt(this.dataset.hours);
+            const suggestedTime = new Date();
+            suggestedTime.setHours(suggestedTime.getHours() + hours);
+            
+            // Round to next hour
+            suggestedTime.setMinutes(0);
+            suggestedTime.setSeconds(0);
+            
+            const formattedTime = suggestedTime.toISOString().slice(0, 16);
+            document.getElementById('scheduled_datetime').value = formattedTime;
+            
+            // Visual feedback
+            document.querySelectorAll('.time-suggestion').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const selectedDateTime = new Date(document.getElementById('scheduled_datetime').value);
+        const now = new Date();
+        
+        if (selectedDateTime <= now) {
+            e.preventDefault();
+            alert('Please select a future date and time.');
+            return false;
+        }
+        
+        // Check if it's too far in the future (optional - 30 days)
+        const thirtyDaysFromNow = new Date();
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+        
+        if (selectedDateTime > thirtyDaysFromNow) {
+            if (!confirm('The selected date is more than 30 days away. Are you sure you want to schedule this far in advance?')) {
+                e.preventDefault();
+                return false;
+            }
+        }
+    });
+</script>
+{% endblock content %}

@@ -690,148 +690,167 @@
     
         </style>
         <script>
-        function showTab(tabName) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
+// Updated JavaScript functions for sessions.html template
+// Replace the existing script section in your sessions.html with this
 
-            // Hide the no sessions message specifically
-            const noSessionsMsg = document.getElementById('noUpcomingSessions');
-            if (noSessionsMsg) {
-                noSessionsMsg.style.display = 'none';
-            }
+function showTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
 
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-            });
+    // Hide the no sessions message specifically
+    const noSessionsMsg = document.getElementById('noUpcomingSessions');
+    if (noSessionsMsg) {
+        noSessionsMsg.style.display = 'none';
+    }
 
-            // Show selected tab content and add active class
-            document.getElementById(tabName + 'Content').style.display = 'block';
-            document.getElementById(tabName + 'Tab').classList.add('active');
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
 
-            // Show no sessions message only for upcoming tab when appropriate
-            if (tabName === 'upcoming' && noSessionsMsg) {
-                noSessionsMsg.style.display = 'block';
-            }
+    // Show selected tab content and add active class
+    document.getElementById(tabName + 'Content').style.display = 'block';
+    document.getElementById(tabName + 'Tab').classList.add('active');
+
+    // Show no sessions message only for upcoming tab when appropriate
+    if (tabName === 'upcoming' && noSessionsMsg) {
+        noSessionsMsg.style.display = 'block';
+    }
+}
+
+function rescheduleSession(sessionId) {
+    if (confirm('Would you like to reschedule this session?')) {
+        // Use Django's URL template tag properly
+        const url = "{% url 'reschedule_session' 0 %}".replace('0', sessionId);
+        window.location.href = url;
+    }
+}
+
+function prepareSession(sessionId) {
+    // Use Django's URL template tag properly
+    const url = "{% url 'prepare_session' 0 %}".replace('0', sessionId);
+    window.location.href = url;
+}
+
+function sendMessage(username) {
+    // For now, redirect to user profile since messaging isn't implemented
+    const url = "{% url 'user_profile' 'placeholder' %}".replace('placeholder', username);
+    window.location.href = url;
+}
+
+function viewSession(requestId) {
+    // Since this view doesn't exist yet, redirect to sessions page
+    alert('Session details view coming soon!');
+    // window.location.href = "{% url 'sessions' %}";
+}
+
+function findAlternative(skillName) {
+    // Redirect to matching with skill filter
+    window.location.href = `{% url 'matching' %}?skill_filter=${encodeURIComponent(skillName)}`;
+}
+
+function bookAgain(username) {
+    // Redirect to user profile
+    const url = "{% url 'user_profile' 'placeholder' %}".replace('placeholder', username);
+    window.location.href = url;
+}
+
+function joinSession(sessionId) {
+    // Placeholder for video call functionality
+    alert('Video call feature coming soon! Please contact your partner directly for now.');
+}
+
+function setRating(sessionId, rating) {
+    // Update visual stars
+    const sessionRatings = document.querySelectorAll(`[data-session="${sessionId}"]`);
+    sessionRatings.forEach((star, index) => {
+        const icon = star.querySelector('i');
+        if (index < rating) {
+            icon.className = 'fas fa-star text-yellow-400';
+        } else {
+            icon.className = 'fas fa-star text-gray-300';
         }
-        function rescheduleSession(sessionId) {
-            // Open reschedule modal or redirect to scheduling page
-            if (confirm('Would you like to reschedule this session?')) {
-                window.location.href = `/sessions/reschedule/${sessionId}/`;
+    });
+    
+    // Set hidden input value
+    const ratingInput = document.getElementById(`rating-${sessionId}`);
+    if (ratingInput) {
+        ratingInput.value = rating;
+    }
+}
+
+function skipFeedback(sessionId) {
+    if (confirm('Skip feedback for this session? You can provide it later from your session history.')) {
+        // Make AJAX call to mark feedback as skipped
+        fetch(`{% url 'skip_feedback' 0 %}`.replace('0', sessionId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error skipping feedback. Please try again.');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error skipping feedback. Please try again.');
+        });
+    }
+}
+
+// Add styles for tab buttons
+const style = document.createElement('style');
+style.textContent = `
+    .tab-button {
+        padding: 12px 24px;
+        border: none;
+        background: none;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
+    .tab-button:hover {
+        color: #3b82f6;
+    }
+    .tab-button.active {
+        color: #3b82f6;
+        border-bottom-color: #3b82f6;
+    }
+    .star-rating {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 2px;
+    }
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    @media (max-width: 768px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
         }
+    }
+`;
+document.head.appendChild(style);
 
-        function prepareSession(sessionId) {
-            // Open session preparation interface
-            window.location.href = `/sessions/prepare/${sessionId}/`;
-        }
-
-        function sendMessage(username) {
-            // Redirect to messaging system
-            window.location.href = `/messages/chat/${username}/`;
-        }
-
-        function viewSession(requestId) {
-            // View session details
-            window.location.href = `/sessions/view/${requestId}/`;
-        }
-
-        function findAlternative(skillName) {
-            // Redirect to matching with skill filter
-            window.location.href = `/matching/?skill_filter=${encodeURIComponent(skillName)}`;
-        }
-
-        function bookAgain(username) {
-            // Redirect to user profile or matching
-            window.location.href = `/users/${username}/`;
-        }
-
-        function setRating(sessionId, rating) {
-            // Update visual stars
-            const sessionRatings = document.querySelectorAll(`[data-session="${sessionId}"]`);
-            sessionRatings.forEach((star, index) => {
-                const icon = star.querySelector('i');
-                if (index < rating) {
-                    icon.className = 'fas fa-star text-yellow-400';
-                } else {
-                    icon.className = 'fas fa-star text-gray-300';
-                }
-            });
-            
-            // Set hidden input value
-            const ratingInput = document.getElementById(`rating-${sessionId}`);
-            if (ratingInput) {
-                ratingInput.value = rating;
-            }
-        }
-
-        function skipFeedback(sessionId) {
-            if (confirm('Skip feedback for this session? You can provide it later from your session history.')) {
-                // Make AJAX call to mark feedback as skipped
-                fetch(`/sessions/skip-feedback/${sessionId}/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    }
-                });
-            }
-        }
-
-        // Add styles for tab buttons
-        const style = document.createElement('style');
-        style.textContent = `
-            .tab-button {
-                padding: 12px 24px;
-                border: none;
-                background: none;
-                color: #6b7280;
-                font-weight: 500;
-                cursor: pointer;
-                border-bottom: 2px solid transparent;
-                transition: all 0.3s ease;
-                display: flex;
-                align-items: center;
-            }
-            .tab-button:hover {
-                color: #3b82f6;
-            }
-            .tab-button.active {
-                color: #3b82f6;
-                border-bottom-color: #3b82f6;
-            }
-            .star-rating {
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 2px;
-            }
-            .grid-2 {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 1.5rem;
-            }
-            @media (max-width: 768px) {
-                .grid-2 {
-                    grid-template-columns: 1fr;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
-
-    // Auto-refresh pending feedback count
-    setInterval(function() {
-        // Optional: Auto-refresh to check for new requests/sessions
-        // This could be replaced with WebSocket connections for real-time updates
-    }, 30000); // Add interval time and close properly
+// Auto-refresh pending feedback count (optional)
+setInterval(function() {
+    // Optional: Auto-refresh to check for new requests/sessions
+    // This could be replaced with WebSocket connections for real-time updates
+}, 300000); // 5 minutes
         </script>
     {% endblock content %}

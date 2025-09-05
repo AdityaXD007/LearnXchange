@@ -1,0 +1,237 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block content %}
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="page-title">{{ profile_user.profile.full_name|default:profile_user.username }}</h1>
+                    <p class="page-description">Learning partner profile</p>
+                </div>
+                {% if not is_own_profile %}
+                    <button onclick="openSessionRequestModal()" class="btn btn-primary">
+                        <i class="fas fa-plus mr-2"></i>
+                        Request Session
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Profile Card -->
+            <div class="lg:col-span-1">
+                <div class="card">
+                    <div class="text-center">
+                        <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-100">
+                            <img src="{% if profile.image %}{{ profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                 alt="{{ profile_user.profile.full_name|default:profile_user.username }}"
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                            {{ profile.full_name|default:profile_user.username }}
+                        </h3>
+                        <p class="text-gray-600 mb-4">@{{ profile_user.username }}</p>
+                        
+                        <!-- Stats -->
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-600">{{ profile.sessions }}</div>
+                                <div class="text-sm text-gray-600">Sessions</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="flex items-center justify-center mb-1">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= profile.rating %}
+                                            <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                        {% else %}
+                                            <i class="fas fa-star text-gray-300 text-sm"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="text-sm text-gray-600">{{ profile.rating }}/5</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-600">
+                                    {% if profile_user.last_login %}
+                                        {% if profile_user.last_login|timesince == "0 minutes" %}Online{% else %}{{ profile_user.last_login|timesince }}{% endif %}
+                                    {% else %}Offline{% endif %}
+                                </div>
+                                <div class="text-sm text-gray-600">Last seen</div>
+                            </div>
+                        </div>
+
+                        {% if not is_own_profile %}
+                            <div class="space-y-2">
+                                <button onclick="openSessionRequestModal()" class="btn btn-primary w-full">
+                                    <i class="fas fa-calendar-plus mr-2"></i>
+                                    Request Session
+                                </button>
+                                <button onclick="sendMessage('{{ profile_user.username }}')" class="btn btn-outline w-full">
+                                    <i class="fas fa-message mr-2"></i>
+                                    Send Message
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Skills and Bio -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Bio -->
+                {% if profile.bio %}
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-3">About</h3>
+                        <p class="text-gray-700 leading-relaxed">{{ profile.bio }}</p>
+                    </div>
+                {% endif %}
+
+                <!-- Teaching Skills -->
+                {% if teaching_skills %}
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Teaching Skills</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for user_skill in teaching_skills %}
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-green-900">{{ user_skill.skill.name }}</h4>
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                            {{ user_skill.get_proficiency_level_display }}
+                                        </span>
+                                    </div>
+                                    {% if user_skill.skill.description %}
+                                        <p class="text-sm text-green-700">{{ user_skill.skill.description }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Learning Skills -->
+                {% if learning_skills %}
+                    <div class="card">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Learning Interests</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {% for user_skill in learning_skills %}
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h4 class="font-medium text-blue-900">{{ user_skill.skill.name }}</h4>
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                            {{ user_skill.get_proficiency_level_display }}
+                                        </span>
+                                    </div>
+                                    {% if user_skill.skill.description %}
+                                        <p class="text-sm text-blue-700">{{ user_skill.skill.description }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if not teaching_skills and not learning_skills %}
+                    <div class="card text-center py-12">
+                        <div class="text-gray-400 mb-4">
+                            <i class="fas fa-user-slash fa-3x"></i>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">No skills listed yet</h3>
+                        <p class="text-gray-600">This user hasn't added their skills yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Session Request Modal -->
+{% if not is_own_profile %}
+<div id="sessionRequestModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold">Request Learning Session</h3>
+                    <button onclick="closeSessionRequestModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <form method="POST" action="{% url 'request_session' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="partner_username" value="{{ profile_user.username }}">
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="form-label">What would you like to learn?</label>
+                            <select name="learning_skill" class="form-input form-select" required>
+                                <option value="">Choose a skill...</option>
+                                {% for skill in teaching_skills %}
+                                    <option value="{{ skill.skill.name }}">{{ skill.skill.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">What can you teach in return?</label>
+                            <input type="text" name="teaching_skill" class="form-input" placeholder="Your skill to offer">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Session Length</label>
+                            <select name="session_length" class="form-input form-select" required>
+                                <option value="30">30 minutes</option>
+                                <option value="60" selected>60 minutes</option>
+                                <option value="90">90 minutes</option>
+                                <option value="120">2 hours</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Message (Optional)</label>
+                            <textarea name="message" class="form-input form-textarea" placeholder="Tell them why you'd like to learn from them..."></textarea>
+                        </div>
+                        
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" class="btn btn-primary flex-1">
+                                <i class="fas fa-paper-plane mr-2"></i>
+                                Send Request
+                            </button>
+                            <button type="button" onclick="closeSessionRequestModal()" class="btn btn-outline">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+function openSessionRequestModal() {
+    document.getElementById('sessionRequestModal').classList.remove('hidden');
+}
+
+function closeSessionRequestModal() {
+    document.getElementById('sessionRequestModal').classList.add('hidden');
+}
+
+function sendMessage(username) {
+    // For now, just alert - replace with actual messaging system
+    alert('Messaging feature coming soon!');
+}
+
+// Close modal when clicking outside
+document.getElementById('sessionRequestModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeSessionRequestModal();
+    }
+});
+</script>
+{% endblock content %}

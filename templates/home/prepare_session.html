@@ -1,0 +1,261 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block content %}
+<main class="main-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="page-title">Prepare Teaching Session</h1>
+                    <p class="page-description">Plan your lesson and get ready to teach</p>
+                </div>
+                <a href="{% url 'sessions' %}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Sessions
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container max-w-4xl">
+        <!-- Session Overview -->
+        <div class="card mb-6">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div class="flex items-start gap-4">
+                    <img src="{% if session.student.profile.image %}{{ session.student.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                         alt="{{ session.student.profile.full_name|default:session.student.username }}"
+                         class="w-16 h-16 rounded-full border-2 border-blue-200">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-xl font-semibold text-blue-900 mb-2">{{ session.skill.name }}</h3>
+                                <p class="text-blue-700 mb-3">
+                                    Teaching {{ session.student.profile.full_name|default:session.student.username }}
+                                </p>
+                                <div class="flex items-center gap-6 text-sm text-blue-700">
+                                    <span><i class="fas fa-calendar mr-2"></i>{{ session.scheduled_time|date:"F j, Y" }}</span>
+                                    <span><i class="fas fa-clock mr-2"></i>{{ session.scheduled_time|time:"g:i A" }}</span>
+                                    <span><i class="fas fa-hourglass-half mr-2"></i>{{ session.duration }} minutes</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                                Teaching Session
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Session Planning Form -->
+            <div class="lg:col-span-2">
+                <div class="card">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Session Plan</h3>
+                    
+                    <form method="POST" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        <!-- Learning Objectives -->
+                        <div>
+                            <label class="form-label">Learning Objectives</label>
+                            <textarea name="objectives" 
+                                      class="form-input form-textarea"
+                                      rows="3"
+                                      placeholder="What should your student learn or achieve by the end of this session?"></textarea>
+                            <p class="text-sm text-gray-600 mt-1">Be specific about what you want to cover</p>
+                        </div>
+                        
+                        <!-- Session Structure -->
+                        <div>
+                            <label class="form-label">Session Structure & Timeline</label>
+                            <textarea name="structure" 
+                                      class="form-input form-textarea"
+                                      rows="4"
+                                      placeholder="How will you structure your {{ session.duration }}-minute session?&#10;e.g., 5 min intro, 15 min theory, 25 min practice, 10 min Q&A, 5 min wrap-up"></textarea>
+                            <p class="text-sm text-gray-600 mt-1">Break down how you'll spend the time</p>
+                        </div>
+                        
+                        <!-- Resources & Materials -->
+                        <div>
+                            <label class="form-label">Resources & Materials</label>
+                            <textarea name="resources" 
+                                      class="form-input form-textarea"
+                                      rows="3"
+                                      placeholder="What materials, links, or resources will you share?"></textarea>
+                            <p class="text-sm text-gray-600 mt-1">Links, documents, tools, etc.</p>
+                        </div>
+                        
+                        <!-- Prerequisites -->
+                        <div>
+                            <label class="form-label">Prerequisites & Preparation</label>
+                            <textarea name="prerequisites" 
+                                      class="form-input form-textarea"
+                                      rows="2"
+                                      placeholder="What should your student prepare beforehand?"></textarea>
+                            <p class="text-sm text-gray-600 mt-1">Any software, accounts, or materials they need</p>
+                        </div>
+                        
+                        <!-- Session Notes -->
+                        <div>
+                            <label class="form-label">Teaching Notes & Key Points</label>
+                            <textarea name="notes" 
+                                      class="form-input form-textarea"
+                                      rows="5"
+                                      placeholder="Your personal notes, key points to remember, common mistakes to address, etc.">{{ session.notes }}</textarea>
+                            <p class="text-sm text-gray-600 mt-1">Private notes to help you during the session</p>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex gap-4 pt-6">
+                            <button type="submit" class="btn btn-primary flex-1">
+                                <i class="fas fa-save mr-2"></i>
+                                Save Session Plan
+                            </button>
+                            <a href="{% url 'sessions' %}" class="btn btn-outline">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Teaching Tips Sidebar -->
+            <div class="space-y-6">
+                <div class="card border-green-200 bg-green-50">
+                    <h4 class="font-semibold text-green-900 mb-4">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        Teaching Tips
+                    </h4>
+                    <div class="space-y-3 text-sm text-green-800">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-green-600 mt-0.5"></i>
+                            <span>Start with what they already know</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-green-600 mt-0.5"></i>
+                            <span>Ask questions to check understanding</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-green-600 mt-0.5"></i>
+                            <span>Use examples and real-world applications</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-green-600 mt-0.5"></i>
+                            <span>Leave time for practice and questions</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-check-circle text-green-600 mt-0.5"></i>
+                            <span>End with a clear summary</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-blue-200 bg-blue-50">
+                    <h4 class="font-semibold text-blue-900 mb-4">
+                        <i class="fas fa-tools mr-2"></i>
+                        Helpful Tools
+                    </h4>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <div class="font-medium text-blue-900">Screen Sharing</div>
+                            <div class="text-blue-700">Share your screen to demonstrate</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-blue-900">Shared Documents</div>
+                            <div class="text-blue-700">Use Google Docs for collaboration</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-blue-900">Code Sharing</div>
+                            <div class="text-blue-700">Use CodePen, JSFiddle, or Repl.it</div>
+                        </div>
+                        <div>
+                            <div class="font-medium text-blue-900">Whiteboarding</div>
+                            <div class="text-blue-700">Use Miro or Excalidraw for diagrams</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-yellow-200 bg-yellow-50">
+                    <h4 class="font-semibold text-yellow-900 mb-4">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Remember
+                    </h4>
+                    <div class="space-y-2 text-sm text-yellow-800">
+                        <div>• Test your tech setup beforehand</div>
+                        <div>• Join the session 5 minutes early</div>
+                        <div>• Have backup plans for technical issues</div>
+                        <div>• Keep contact info handy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card mt-6 border-gray-200 bg-gray-50">
+            <h4 class="font-semibold text-gray-900 mb-4">Quick Actions</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="sendMessage('{{ session.student.username }}')" class="btn btn-outline">
+                    <i class="fas fa-message mr-2"></i>
+                    Message Student
+                </button>
+                <button onclick="testTech()" class="btn btn-outline">
+                    <i class="fas fa-video mr-2"></i>
+                    Test Tech Setup
+                </button>
+                <button onclick="setReminder()" class="btn btn-outline">
+                    <i class="fas fa-bell mr-2"></i>
+                    Set Reminder
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+function sendMessage(username) {
+    alert('Messaging feature coming soon! You can contact your student through the platform.');
+}
+
+function testTech() {
+    alert('Tech test feature coming soon! Please ensure your camera, microphone, and internet connection are working properly.');
+}
+
+function setReminder() {
+    const sessionTime = new Date('{{ session.scheduled_time|date:"c" }}');
+    const reminderTime = new Date(sessionTime.getTime() - 30 * 60000); // 30 minutes before
+    
+    alert(`Session reminder set for ${reminderTime.toLocaleString()}.\nNote: This is a placeholder - actual reminder system coming soon!`);
+}
+
+// Auto-save form data
+let autoSaveTimeout;
+document.querySelectorAll('textarea').forEach(textarea => {
+    textarea.addEventListener('input', function() {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(() => {
+            // Auto-save functionality would go here
+            console.log('Auto-saving session plan...');
+        }, 2000);
+    });
+});
+
+// Form submission handling
+document.querySelector('form').addEventListener('submit', function(e) {
+    const textareas = this.querySelectorAll('textarea');
+    let hasContent = false;
+    
+    textareas.forEach(textarea => {
+        if (textarea.value.trim()) {
+            hasContent = true;
+        }
+    });
+    
+    if (!hasContent) {
+        e.preventDefault();
+        alert('Please add some content to your session plan before saving.');
+    }
+});
+</script>
+{% endblock content %}

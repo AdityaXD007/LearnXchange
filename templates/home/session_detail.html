@@ -1,0 +1,516 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block content %}
+<main class="main-content">
+    <div class="page-header">
+        <div class="container">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'sessions' %}" class="btn btn-outline">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Sessions
+                </a>
+                <div>
+                    <h1 class="page-title">Session Details</h1>
+                    <p class="page-description">Manage your learning session</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main Session Info -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Session Overview -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="flex items-center justify-between">
+                                <h3 class="card-title">{{ session.skill.name }}</h3>
+                                <span class="px-3 py-1 rounded-full text-sm font-medium 
+                                    {% if session.status == 'scheduled' %}bg-blue-100 text-blue-800
+                                    {% elif session.status == 'completed' %}bg-green-100 text-green-800
+                                    {% elif session.status == 'cancelled' %}bg-red-100 text-red-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    <i class="fas fa-{% if session.status == 'scheduled' %}clock{% elif session.status == 'completed' %}check{% elif session.status == 'cancelled' %}times{% else %}question{% endif %} mr-1"></i>
+                                    {{ session.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-4">
+                            <img src="{% if partner.profile.image %}{{ partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                 alt="{{ partner.profile.full_name|default:partner.username }}"
+                                 class="w-16 h-16 rounded-full">
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-gray-900 mb-2">
+                                    {% if is_teacher %}
+                                        Teaching session with {{ partner.profile.full_name|default:partner.username }}
+                                    {% else %}
+                                        Learning session with {{ partner.profile.full_name|default:partner.username }}
+                                    {% endif %}
+                                </h4>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-calendar text-blue-500"></i>
+                                        <span>{{ session.scheduled_time|date:"F j, Y" }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-clock text-green-500"></i>
+                                        <span>{{ session.scheduled_time|time:"g:i A" }} ({{ session.duration }} min)</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-video text-purple-500"></i>
+                                        <span>Online Video Call</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-{% if is_teacher %}chalkboard-teacher{% else %}graduation-cap{% endif %} text-orange-500"></i>
+                                        <span>{% if is_teacher %}Teaching{% else %}Learning{% endif %}</span>
+                                    </div>
+                                </div>
+                                
+                                {% if session.notes %}
+                                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                                    <h5 class="font-medium text-gray-900 mb-2">
+                                        {% if is_teacher %}Your Session Plan:{% else %}Session Plan:{% endif %}
+                                    </h5>
+                                    <p class="text-sm text-gray-700">{{ session.notes }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Session Actions -->
+                    {% if session.status == 'scheduled' %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Session Actions</h3>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            <!-- Join Meeting (if time is near) -->
+                            <button onclick="checkAndJoinSession({{ session.id }})" 
+                                    class="btn btn-success" 
+                                    id="joinSessionBtn">
+                                <i class="fas fa-video mr-2"></i>
+                                Join Meeting
+                            </button>
+                            
+                            <!-- Reschedule -->
+                            <button onclick="rescheduleSession({{ session.id }})" 
+                                    class="btn btn-primary">
+                                <i class="fas fa-calendar mr-2"></i>
+                                Reschedule
+                            </button>
+                            
+                            <!-- Cancel Session -->
+                            <button onclick="showCancelModal()" 
+                                    class="btn btn-danger">
+                                <i class="fas fa-times mr-2"></i>
+                                Cancel Session
+                            </button>
+                            
+                            <!-- Message Partner -->
+                            <button onclick="sendMessage('{{ partner.username }}')" 
+                                    class="btn btn-outline">
+                                <i class="fas fa-message mr-2"></i>
+                                Message {{ partner.username }}
+                            </button>
+                            
+                            {% if is_teacher %}
+                            <!-- Prepare Session (Teachers only) -->
+                            <button onclick="prepareSession({{ session.id }})" 
+                                    class="btn btn-outline">
+                                <i class="fas fa-edit mr-2"></i>
+                                Prepare Session
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Session History/Feedback (if completed) -->
+                    {% if session.status == 'completed' %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Session Feedback</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            {% if is_teacher and session.rating_by_student %}
+                            <div class="p-4 bg-green-50 rounded-lg">
+                                <h4 class="font-medium text-green-900 mb-2">Student Feedback</h4>
+                                <div class="flex items-center gap-2 mb-2">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= session.rating_by_student %}
+                                            <i class="fas fa-star text-yellow-400"></i>
+                                        {% else %}
+                                            <i class="fas fa-star text-gray-300"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="text-sm text-gray-600">{{ session.rating_by_student }}.0/5.0</span>
+                                </div>
+                                {% if session.feedback_by_student %}
+                                    <p class="text-sm text-gray-700">"{{ session.feedback_by_student }}"</p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if not is_teacher and session.rating_by_teacher %}
+                            <div class="p-4 bg-blue-50 rounded-lg">
+                                <h4 class="font-medium text-blue-900 mb-2">Teacher Feedback</h4>
+                                <div class="flex items-center gap-2 mb-2">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= session.rating_by_teacher %}
+                                            <i class="fas fa-star text-yellow-400"></i>
+                                        {% else %}
+                                            <i class="fas fa-star text-gray-300"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="text-sm text-gray-600">{{ session.rating_by_teacher }}.0/5.0</span>
+                                </div>
+                                {% if session.feedback_by_teacher %}
+                                    <p class="text-sm text-gray-700">"{{ session.feedback_by_teacher }}"</p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Book Again -->
+                            <button onclick="bookAgain('{{ partner.username }}')" 
+                                    class="btn btn-primary">
+                                <i class="fas fa-redo mr-2"></i>
+                                Book Another Session
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Partner Profile -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Your Learning Partner</h3>
+                        </div>
+                        
+                        <div class="text-center">
+                            <img src="{% if partner.profile.image %}{{ partner.profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                 alt="{{ partner.profile.full_name|default:partner.username }}"
+                                 class="w-20 h-20 rounded-full mx-auto mb-3">
+                            <h4 class="font-semibold text-gray-900 mb-1">
+                                {{ partner.profile.full_name|default:partner.username }}
+                            </h4>
+                            <p class="text-sm text-gray-600 mb-3">@{{ partner.username }}</p>
+                            
+                            <div class="flex items-center justify-center gap-4 text-sm text-gray-600 mb-4">
+                                <div class="text-center">
+                                    <div class="font-medium text-gray-900">{{ partner.profile.rating|default:"N/A" }}</div>
+                                    <div class="text-xs">Rating</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="font-medium text-gray-900">{{ partner.profile.sessions|default:0 }}</div>
+                                    <div class="text-xs">Sessions</div>
+                                </div>
+                            </div>
+                            
+                            <a href="{% url 'user_profile' partner.username %}" 
+                               class="btn btn-outline btn-sm w-full">
+                                View Full Profile
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Session Timeline -->
+                    {% if session.status == 'scheduled' %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Session Timeline</h3>
+                        </div>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                <span class="text-gray-600">Session Scheduled</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span class="text-gray-900 font-medium" id="timeUntilSession">
+                                    Loading...
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                                <span class="text-gray-400">Session Complete</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Quick Actions</h3>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <button onclick="sendMessage('{{ partner.username }}')" 
+                                    class="btn btn-outline w-full text-left">
+                                <i class="fas fa-message mr-2"></i>
+                                Send Message
+                            </button>
+                            <a href="{% url 'matching' %}" 
+                               class="btn btn-outline w-full text-left">
+                                <i class="fas fa-search mr-2"></i>
+                                Find More Sessions
+                            </a>
+                            <a href="{% url 'sessions' %}" 
+                               class="btn btn-outline w-full text-left">
+                                <i class="fas fa-calendar mr-2"></i>
+                                View All Sessions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Cancel Session Modal -->
+<div id="cancelModal" class="modal-overlay" style="display: none;">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3 class="modal-title">Cancel Session</h3>
+            <button onclick="hideCancelModal()" class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form method="POST" action="{% url 'cancel_session' session.id %}">
+            {% csrf_token %}
+            <div class="modal-body">
+                <p class="text-gray-600 mb-4">
+                    Are you sure you want to cancel this session? {{ partner.profile.full_name|default:partner.username }} will be notified.
+                </p>
+                <div>
+                    <label for="reason" class="form-label">Reason for cancellation</label>
+                    <select name="reason" id="reason" class="form-input form-select" required>
+                        <option value="">Select a reason</option>
+                        <option value="scheduling_conflict">Scheduling conflict</option>
+                        <option value="emergency">Emergency</option>
+                        <option value="illness">Illness</option>
+                        <option value="technical_issues">Technical issues</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="hideCancelModal()" class="btn btn-outline">
+                    Keep Session
+                </button>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-times mr-2"></i>
+                    Cancel Session
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-container {
+        background: white;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-header {
+        padding: 20px 24px 16px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: between;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #111827;
+        flex: 1;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 4px;
+    }
+
+    .modal-body {
+        padding: 20px 24px;
+    }
+
+    .modal-footer {
+        padding: 16px 24px 20px;
+        border-top: 1px solid #e5e7eb;
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .grid-cols-1 {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) {
+        .md\:grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .lg\:grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+        .lg\:col-span-2 {
+            grid-column: span 2;
+        }
+    }
+</style>
+
+<script>
+    // Update time until session
+    function updateTimeUntilSession() {
+        const sessionTime = new Date('{{ session.scheduled_time|date:"c" }}');
+        const now = new Date();
+        const timeDiff = sessionTime - now;
+        const element = document.getElementById('timeUntilSession');
+        
+        if (!element) return;
+        
+        if (timeDiff > 0) {
+            const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (days > 0) {
+                element.textContent = `${days} days, ${hours} hours`;
+            } else if (hours > 0) {
+                element.textContent = `${hours} hours, ${minutes} minutes`;
+            } else if (minutes > 0) {
+                element.textContent = `${minutes} minutes`;
+            } else {
+                element.textContent = 'Starting soon!';
+            }
+        } else {
+            element.textContent = 'Session time passed';
+        }
+    }
+
+    // Check if user can join session and update button accordingly
+    function updateJoinButton() {
+        const sessionTime = new Date('{{ session.scheduled_time|date:"c" }}');
+        const now = new Date();
+        const timeDiff = (sessionTime - now) / (1000 * 60); // minutes
+        const joinBtn = document.getElementById('joinSessionBtn');
+        
+        if (!joinBtn) return;
+        
+        if (timeDiff > 15) {
+            joinBtn.disabled = true;
+            joinBtn.innerHTML = '<i class="fas fa-clock mr-2"></i>Available 15 min before';
+            joinBtn.className = 'btn btn-outline';
+        } else if (timeDiff > -30) { // Allow joining up to 30 minutes after start
+            joinBtn.disabled = false;
+            joinBtn.innerHTML = '<i class="fas fa-video mr-2"></i>Join Meeting';
+            joinBtn.className = 'btn btn-success';
+        } else {
+            joinBtn.disabled = true;
+            joinBtn.innerHTML = '<i class="fas fa-times mr-2"></i>Session Ended';
+            joinBtn.className = 'btn btn-outline';
+        }
+    }
+
+    // Initialize and update every minute
+    updateTimeUntilSession();
+    updateJoinButton();
+    setInterval(updateTimeUntilSession, 60000);
+    setInterval(updateJoinButton, 60000);
+
+    // Session functions
+    function checkAndJoinSession(sessionId) {
+        fetch(`/sessions/join/${sessionId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.open(data.meeting_url, '_blank');
+            } else {
+                alert(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to join session. Please try again.');
+        });
+    }
+
+    function rescheduleSession(sessionId) {
+        if (confirm('Would you like to reschedule this session?')) {
+            window.location.href = `/sessions/reschedule/${sessionId}/`;
+        }
+    }
+
+    function prepareSession(sessionId) {
+        window.location.href = `/sessions/prepare/${sessionId}/`;
+    }
+
+    function sendMessage(username) {
+        window.location.href = `/messages/chat/${username}/`;
+    }
+
+    function bookAgain(username) {
+        window.location.href = `/users/${username}/`;
+    }
+
+    function showCancelModal() {
+        document.getElementById('cancelModal').style.display = 'flex';
+    }
+
+    function hideCancelModal() {
+        document.getElementById('cancelModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('cancelModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideCancelModal();
+        }
+    });
+</script>
+{% endblock content %}

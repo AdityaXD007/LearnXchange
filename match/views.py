@@ -335,7 +335,7 @@ def user_profile_view(request, username):
         'is_own_profile': user == request.user,
     }
     
-    return render(request, 'user_profile.html', context)
+    return render(request, 'home/user_profile.html', context)
 
 
 
@@ -515,6 +515,7 @@ def skip_feedback(request, session_id):
     return JsonResponse({'success': True})
 
 
+
 @login_required
 def reschedule_session(request, session_id):
     """Reschedule a session"""
@@ -530,10 +531,26 @@ def reschedule_session(request, session_id):
         return redirect('sessions')
     
     if request.method == 'POST':
+        new_date = request.POST.get('new_date')
+        new_time = request.POST.get('new_time')
         new_datetime = request.POST.get('new_datetime')
+        reschedule_reason = request.POST.get('reschedule_reason', '')
+        
         try:
-            new_datetime = datetime.fromisoformat(new_datetime.replace('Z', '+00:00'))
-            session.scheduled_time = new_datetime
+            # Parse the combined datetime
+            if new_datetime:
+                new_datetime_obj = datetime.fromisoformat(new_datetime.replace('Z', '+00:00'))
+            else:
+                # Fallback: combine date and time
+                datetime_str = f"{new_date}T{new_time}:00"
+                new_datetime_obj = datetime.fromisoformat(datetime_str)
+            
+            # Make timezone aware
+            from django.utils import timezone as django_timezone
+            if django_timezone.is_naive(new_datetime_obj):
+                new_datetime_obj = django_timezone.make_aware(new_datetime_obj)
+            
+            session.scheduled_time = new_datetime_obj
             session.save()
             
             # Notify the other party (in a real app, send email/notification)
@@ -544,15 +561,20 @@ def reschedule_session(request, session_id):
             )
             return redirect('sessions')
             
-        except ValueError:
-            messages.error(request, 'Invalid date and time format.')
+        except ValueError as e:
+            messages.error(request, f'Invalid date and time format: {str(e)}')
     
-    # Render reschedule form
+    # Calculate max date (3 months from now)
+    from datetime import timedelta
+    today = timezone.now().date()
+    max_date = today + timedelta(days=90)
+    
     context = {
         'session': session,
+        'today': today,
+        'max_date': max_date,
     }
-    return render(request, 'reschedule_session.html', context)
-
+    return render(request, 'home/reschedule_session.html', context)
 
 @login_required
 def prepare_session(request, session_id):
@@ -575,7 +597,7 @@ def prepare_session(request, session_id):
     context = {
         'session': session,
     }
-    return render(request, 'prepare_session.html', context)
+    return render(request, 'home/prepare_session.html', context)
 
 
 def update_user_rating(user):
@@ -626,4 +648,3 @@ def create_learning_session_from_request(session_request):
     except Skill.DoesNotExist:
         # Handle case where skill doesn't exist
         return None
-
