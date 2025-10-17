@@ -1,18 +1,19 @@
 {% extends "base/base.html" %}
 {% load static %}
+
 {% block content %}
 <main class="main-content">
     <!-- Page Header -->
     <div class="page-header">
         <div class="container">
-            <div class="flex justify-between items-center">
-                <div>
+            <div class="profile-header">
+                <div class="profile-header-info">
                     <h1 class="page-title">{{ profile_user.profile.full_name|default:profile_user.username }}</h1>
                     <p class="page-description">Learning partner profile</p>
                 </div>
                 {% if not is_own_profile %}
                     <button onclick="openSessionRequestModal()" class="btn btn-primary">
-                        <i class="fas fa-plus mr-2"></i>
+                        <i class="fas fa-plus"></i>
                         Request Session
                     </button>
                 {% endif %}
@@ -21,57 +22,59 @@
     </div>
 
     <div class="container">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="profile-grid">
             <!-- Profile Card -->
-            <div class="lg:col-span-1">
-                <div class="card">
-                    <div class="text-center">
-                        <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-blue-100">
-                            <img src="{% if profile.image %}{{ profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
-                                 alt="{{ profile_user.profile.full_name|default:profile_user.username }}"
-                                 class="w-full h-full object-cover">
+            <div class="profile-sidebar">
+                <div class="card profile-card">
+                    <div class="profile-card-content">
+                        <div class="profile-avatar-section">
+                            <div class="profile-avatar-container">
+                                <img src="{% if profile.image %}{{ profile.image.url }}{% else %}{% static 'assets/default-avatar.png' %}{% endif %}"
+                                    alt="{{ profile_user.profile.full_name|default:profile_user.username }}"
+                                    class="profile-avatar-image">
+                            </div>
+                            <h3 class="profile-name">
+                                {{ profile.full_name|default:profile_user.username }}
+                            </h3>
+                            <p class="profile-username">@{{ profile_user.username }}</p>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                            {{ profile.full_name|default:profile_user.username }}
-                        </h3>
-                        <p class="text-gray-600 mb-4">@{{ profile_user.username }}</p>
                         
                         <!-- Stats -->
-                        <div class="grid grid-cols-3 gap-4 mb-6">
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-blue-600">{{ profile.sessions }}</div>
-                                <div class="text-sm text-gray-600">Sessions</div>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ profile.sessions }}</div>
+                                <div class="stat-label">Sessions</div>
                             </div>
-                            <div class="text-center">
-                                <div class="flex items-center justify-center mb-1">
+                            <div class="stat-item">
+                                <div class="rating-stars">
                                     {% for i in "12345" %}
                                         {% if forloop.counter <= profile.rating %}
-                                            <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                            <i class="fas fa-star star-filled"></i>
                                         {% else %}
-                                            <i class="fas fa-star text-gray-300 text-sm"></i>
+                                            <i class="fas fa-star star-empty"></i>
                                         {% endif %}
                                     {% endfor %}
                                 </div>
-                                <div class="text-sm text-gray-600">{{ profile.rating }}/5</div>
+                                <div class="stat-label">{{ profile.rating }}/5</div>
                             </div>
-                            <div class="text-center">
-                                <div class="text-2xl font-bold text-green-600">
+                            <div class="stat-item">
+                                <div class="stat-number status-online">
                                     {% if profile_user.last_login %}
                                         {% if profile_user.last_login|timesince == "0 minutes" %}Online{% else %}{{ profile_user.last_login|timesince }}{% endif %}
                                     {% else %}Offline{% endif %}
                                 </div>
-                                <div class="text-sm text-gray-600">Last seen</div>
+                                <div class="stat-label">Last seen</div>
                             </div>
                         </div>
 
                         {% if not is_own_profile %}
-                            <div class="space-y-2">
-                                <button onclick="openSessionRequestModal()" class="btn btn-primary w-full">
-                                    <i class="fas fa-calendar-plus mr-2"></i>
+                            <div class="profile-actions">
+                                <button onclick="openSessionRequestModal()" class="btn btn-primary btn-full">
+                                    <i class="fas fa-calendar-plus"></i>
                                     Request Session
                                 </button>
-                                <button onclick="sendMessage('{{ profile_user.username }}')" class="btn btn-outline w-full">
-                                    <i class="fas fa-message mr-2"></i>
+                                <button onclick="sendMessage('{{ profile_user.username }}')" class="btn btn-outline btn-full">
+                                    <i class="fas fa-message"></i>
                                     Send Message
                                 </button>
                             </div>
@@ -81,30 +84,30 @@
             </div>
 
             <!-- Skills and Bio -->
-            <div class="lg:col-span-2 space-y-6">
+            <div class="profile-main">
                 <!-- Bio -->
                 {% if profile.bio %}
-                    <div class="card">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">About</h3>
-                        <p class="text-gray-700 leading-relaxed">{{ profile.bio }}</p>
+                    <div class="card bio-section">
+                        <h3 class="section-title">About</h3>
+                        <p class="bio-text">{{ profile.bio }}</p>
                     </div>
                 {% endif %}
 
                 <!-- Teaching Skills -->
                 {% if teaching_skills %}
-                    <div class="card">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Teaching Skills</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card skills-section">
+                        <h3 class="section-title">Teaching Skills</h3>
+                        <div class="skills-grid">
                             {% for user_skill in teaching_skills %}
-                                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-medium text-green-900">{{ user_skill.skill.name }}</h4>
-                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                <div class="skill-card skill-teaching">
+                                    <div class="skill-header">
+                                        <h4 class="skill-name">{{ user_skill.skill.name }}</h4>
+                                        <span class="skill-level skill-level-teaching">
                                             {{ user_skill.get_proficiency_level_display }}
                                         </span>
                                     </div>
                                     {% if user_skill.skill.description %}
-                                        <p class="text-sm text-green-700">{{ user_skill.skill.description }}</p>
+                                        <p class="skill-description">{{ user_skill.skill.description }}</p>
                                     {% endif %}
                                 </div>
                             {% endfor %}
@@ -114,19 +117,19 @@
 
                 <!-- Learning Skills -->
                 {% if learning_skills %}
-                    <div class="card">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Learning Interests</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="card skills-section">
+                        <h3 class="section-title">Learning Interests</h3>
+                        <div class="skills-grid">
                             {% for user_skill in learning_skills %}
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <h4 class="font-medium text-blue-900">{{ user_skill.skill.name }}</h4>
-                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                <div class="skill-card skill-learning">
+                                    <div class="skill-header">
+                                        <h4 class="skill-name">{{ user_skill.skill.name }}</h4>
+                                        <span class="skill-level skill-level-learning">
                                             {{ user_skill.get_proficiency_level_display }}
                                         </span>
                                     </div>
                                     {% if user_skill.skill.description %}
-                                        <p class="text-sm text-blue-700">{{ user_skill.skill.description }}</p>
+                                        <p class="skill-description">{{ user_skill.skill.description }}</p>
                                     {% endif %}
                                 </div>
                             {% endfor %}
@@ -135,12 +138,14 @@
                 {% endif %}
 
                 {% if not teaching_skills and not learning_skills %}
-                    <div class="card text-center py-12">
-                        <div class="text-gray-400 mb-4">
-                            <i class="fas fa-user-slash fa-3x"></i>
+                    <div class="card empty-state">
+                        <div class="empty-state-content">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-user-slash"></i>
+                            </div>
+                            <h3 class="empty-state-title">No skills listed yet</h3>
+                            <p class="empty-state-description">This user hasn't added their skills yet.</p>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">No skills listed yet</h3>
-                        <p class="text-gray-600">This user hasn't added their skills yet.</p>
                     </div>
                 {% endif %}
             </div>
@@ -150,76 +155,419 @@
 
 <!-- Session Request Modal -->
 {% if not is_own_profile %}
-<div id="sessionRequestModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
-            <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-semibold">Request Learning Session</h3>
-                    <button onclick="closeSessionRequestModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
-                <form method="POST" action="{% url 'request_session' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="partner_username" value="{{ profile_user.username }}">
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="form-label">What would you like to learn?</label>
-                            <select name="learning_skill" class="form-input form-select" required>
-                                <option value="">Choose a skill...</option>
-                                {% for skill in teaching_skills %}
-                                    <option value="{{ skill.skill.name }}">{{ skill.skill.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="form-label">What can you teach in return?</label>
-                            <input type="text" name="teaching_skill" class="form-input" placeholder="Your skill to offer">
-                        </div>
-                        
-                        <div>
-                            <label class="form-label">Session Length</label>
-                            <select name="session_length" class="form-input form-select" required>
-                                <option value="30">30 minutes</option>
-                                <option value="60" selected>60 minutes</option>
-                                <option value="90">90 minutes</option>
-                                <option value="120">2 hours</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="form-label">Message (Optional)</label>
-                            <textarea name="message" class="form-input form-textarea" placeholder="Tell them why you'd like to learn from them..."></textarea>
-                        </div>
-                        
-                        <div class="flex gap-3 pt-4">
-                            <button type="submit" class="btn btn-primary flex-1">
-                                <i class="fas fa-paper-plane mr-2"></i>
-                                Send Request
-                            </button>
-                            <button type="button" onclick="closeSessionRequestModal()" class="btn btn-outline">
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </form>
+<div id="sessionRequestModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Request Learning Session</h3>
+                <button onclick="closeSessionRequestModal()" class="modal-close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+            
+            <form method="POST" action="{% url 'request_session' %}" class="modal-form">
+                {% csrf_token %}
+                <input type="hidden" name="partner_username" value="{{ profile_user.username }}">
+                
+                <div class="form-fields">
+                    <div class="form-field">
+                        <label class="form-label">What would you like to learn?</label>
+                        <select name="learning_skill" class="form-input form-select" required>
+                            <option value="">Choose a skill...</option>
+                            {% for skill in teaching_skills %}
+                                <option value="{{ skill.skill.name }}">{{ skill.skill.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label class="form-label">What can you teach in return?</label>
+                        <input type="text" name="teaching_skill" class="form-input" placeholder="Your skill to offer">
+                    </div>
+                    
+                    <div class="form-field">
+                        <label class="form-label">Session Length</label>
+                        <select name="session_length" class="form-input form-select" required>
+                            <option value="30">30 minutes</option>
+                            <option value="60" selected>60 minutes</option>
+                            <option value="90">90 minutes</option>
+                            <option value="120">2 hours</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-field">
+                        <label class="form-label">Message (Optional)</label>
+                        <textarea name="message" class="form-input form-textarea" placeholder="Tell them why you'd like to learn from them..."></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-primary btn-flex">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Request
+                        </button>
+                        <button type="button" onclick="closeSessionRequestModal()" class="btn btn-outline">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 {% endif %}
 
+<style>
+/* ==========================================================================
+   Profile Page Styles
+   ========================================================================== */
+
+/* Layout & Grid */
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.profile-header-info h1 {
+    margin-bottom: 0.25rem;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .profile-grid {
+        grid-template-columns: 1fr 2fr;
+    }
+}
+
+.profile-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Profile Card */
+.profile-card {
+    padding: 0;
+}
+
+.profile-card-content {
+    text-align: center;
+    padding: 2rem;
+}
+
+.profile-avatar-section {
+    margin-bottom: 1.5rem;
+}
+
+.profile-avatar-container {
+    width: 140px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #f3f4f6;
+    margin: 0 auto 1rem auto;
+}
+
+.profile-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.profile-username {
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+/* Stats */
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 0.25rem;
+}
+
+.status-online {
+    color: #16a34a !important;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.rating-stars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.25rem;
+}
+
+.star-filled {
+    color: #fbbf24;
+    font-size: 0.875rem;
+}
+
+.star-empty {
+    color: #d1d5db;
+    font-size: 0.875rem;
+}
+
+/* Profile Actions */
+.profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.btn-flex {
+    flex: 1;
+}
+
+/* Section Styles */
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.bio-text {
+    color: #374151;
+    line-height: 1.6;
+}
+
+/* Skills Grid */
+.skills-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.skill-card {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-width: 1px;
+}
+
+.skill-teaching {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.skill-learning {
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.skill-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.skill-name {
+    font-weight: 500;
+    margin: 0;
+}
+
+.skill-teaching .skill-name {
+    color: #14532d;
+}
+
+.skill-learning .skill-name {
+    color: #1e3a8a;
+}
+
+.skill-level {
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+}
+
+.skill-level-teaching {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.skill-level-learning {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+.skill-description {
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.skill-teaching .skill-description {
+    color: #15803d;
+}
+
+.skill-learning .skill-description {
+    color: #1d4ed8;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state-content {
+    max-width: 20rem;
+    margin: 0 auto;
+}
+
+.empty-state-icon {
+    color: #9ca3af;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 50;
+}
+
+.modal-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 1rem;
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 28rem;
+    width: 100%;
+}
+
+.modal-content {
+    padding: 1.5rem;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.modal-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close-btn {
+    color: #9ca3af;
+    background: none;
+    border: none;
+    font-size: 1.125rem;
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+.modal-close-btn:hover {
+    color: #6b7280;
+}
+
+.form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+}
+
+/* Button Icon Spacing */
+.btn i {
+    margin-right: 0.5rem;
+}
+
+.btn i:last-child {
+    margin-right: 0;
+    margin-left: 0.5rem;
+}
+</style>
+
 <script>
 function openSessionRequestModal() {
-    document.getElementById('sessionRequestModal').classList.remove('hidden');
+    const modal = document.getElementById('sessionRequestModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('active');
 }
 
 function closeSessionRequestModal() {
-    document.getElementById('sessionRequestModal').classList.add('hidden');
+    const modal = document.getElementById('sessionRequestModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('active');
 }
 
 function sendMessage(username) {
@@ -230,6 +578,13 @@ function sendMessage(username) {
 // Close modal when clicking outside
 document.getElementById('sessionRequestModal')?.addEventListener('click', function(e) {
     if (e.target === this) {
+        closeSessionRequestModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
         closeSessionRequestModal();
     }
 });
